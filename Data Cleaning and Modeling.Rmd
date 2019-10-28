@@ -42,6 +42,6 @@ Game.Stats.Away.1 <-  Game.Stats.Away %>%
 varname = 'Away'
 names(Game.Stats.Away.1)[4:ncol(Game.Stats.Away.1)] <- paste0(rep(varname), "_", c(names(Game.Stats.Away.1[, 4:23])))
 
-Game.Stats.V2 <- full_join(Game.Stats.Home.1, Game.Stats.Away.1)
+Game.Stats.V2 <- na.omit(full_join(Game.Stats.Home.1, Game.Stats.Away.1))
 ```
 
