@@ -22,9 +22,9 @@ Predictions = read.csv("Data/Predictions.csv")
 Cleaning
 
 ```{r}
-Game.Stats.Home <- Game.Stats %>% 
-  filter(X == "@")
 Game.Stats.Away <- Game.Stats %>% 
+  filter(X == "@")
+Game.Stats.Home <- Game.Stats %>% 
   filter(X == "")
 #not sure what to do with this yet but we can figure it out
 Game.Stats.N <- Game.Stats %>% 
