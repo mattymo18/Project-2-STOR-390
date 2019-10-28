@@ -1,0 +1,48 @@
+---
+title: "Data Cleaning and Modeling"
+author: "Matt Johnson"
+date: "10/27/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+```
+
+Import Data
+
+```{r}
+Game.Results = read.csv("Data/GameResults.csv")
+Game.Stats = read.csv("Data/GameStats.csv")
+Predictions = read.csv("Data/Predictions.csv")
+```
+
+Cleaning
+
+```{r}
+Game.Stats.Home <- Game.Stats %>% 
+  filter(X == "@")
+Game.Stats.Away <- Game.Stats %>% 
+  filter(X == "")
+#not sure what to do with this yet but we can figure it out
+Game.Stats.N <- Game.Stats %>% 
+  filter(X == "N")
+
+Game.Stats.Home.1 <-  Game.Stats.Home %>% 
+  rename(Home.Team = School) %>% 
+  rename(Visitor.Team = Opponent) %>% 
+  select(c(-1, -4, -5))
+
+Game.Stats.Away.1 <-  Game.Stats.Away %>% 
+  rename(Visitor.Team = School) %>% 
+  rename(Home.Team = Opponent) %>% 
+  select(c(-1, -4, -5))
+varname = 'Away'
+n=1
+names(Game.Stats.Away.1)[4:ncol(Game.Stats.Away.1)] <- paste0(rep(varname), "_", c(names(Game.Stats.Away.1[, 4:23])))
+
+Game.Stats.V2 <- full_join(Game.Stats.Home.1, Game.Stats.Away.1)
+```
+
