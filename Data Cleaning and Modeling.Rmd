@@ -42,8 +42,12 @@ Game.Stats.Away.1 <-  Game.Stats.Away %>%
 varname.away = 'Away'
 names(Game.Stats.Away.1)[4:ncol(Game.Stats.Away.1)] <- paste0(rep(varname.away), "_", c(names(Game.Stats.Away.1[, 4:23])))
 
-varname.home = 'Home'
+varname.home <-  'Home'
 Game.Stats.V2 <- na.omit(full_join(Game.Stats.Home.1, Game.Stats.Away.1))
 names(Game.Stats.V2)[4:23] <- paste0(rep(varname.home), "_", c(names(Game.Stats.Home.1[, 4:23])))
+
+#Game.Results cleaning
+Game.Results.V2 <- Game.Results %>% 
+  select(c(1:5, 8, 9, 10))
 ```
 
