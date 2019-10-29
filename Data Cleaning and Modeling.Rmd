@@ -49,5 +49,7 @@ names(Game.Stats.V2)[4:23] <- paste0(rep(varname.home), "_", c(names(Game.Stats.
 #Game.Results cleaning
 Game.Results.V2 <- Game.Results %>% 
   select(c(1:5, 8, 9, 10))
+
+Game.Data.V1 <- na.omit(left_join(Game.Stats.V2, Game.Results.V2))
 ```
 
