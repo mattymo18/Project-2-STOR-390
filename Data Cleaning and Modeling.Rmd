@@ -14,9 +14,9 @@ library(dplyr)
 Import Data
 
 ```{r}
-Game.Results = read.csv("Data/GameResults.csv")
-Game.Stats = read.csv("Data/GameStats.csv")
-Predictions = read.csv("Data/Predictions.csv")
+Game.Results = read.csv("GameResults.csv")
+Game.Stats = read.csv("GameStats.csv")
+Predictions = read.csv("Predictions.csv")
 ```
 
 Cleaning
