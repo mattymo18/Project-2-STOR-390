@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(dplyr)
+library(readxl)
 ```
 
 Import Data
@@ -52,4 +53,61 @@ Game.Results.V2 <- Game.Results %>%
 
 Game.Data.V1 <- na.omit(left_join(Game.Stats.V2, Game.Results.V2))
 ```
+
+```{r}
+O.Stats17 = read_xlsx("2017OStats.xlsx", skip = 1)
+D.Stats17 = read_xlsx("2017DStats.xlsx", skip = 1)
+
+O.Rank17 = data.frame(O.Stats17$School, O.Stats17$O.Rank17)
+colnames(O.Rank17)[colnames(O.Rank17)=="O.Stats17.School"] <- "Home.Team"
+colnames(O.Rank17)[colnames(O.Rank17)=="O.Stats17.O.Rank17"] <- "Home.O.Rank"
+
+D.Rank17 = data.frame(D.Stats17$School, D.Stats17$D.Rank17)
+colnames(D.Rank17)[colnames(D.Rank17)=="D.Stats17.School"] <- "Home.Team"
+colnames(D.Rank17)[colnames(D.Rank17)=="D.Stats17.D.Rank17"] <- "Home.D.Rank"
+
+Data17 = filter(Game.Data.V1, str_detect(Date, '2017'))
+
+join = left_join(Data17, O.Rank17)
+join2 = left_join(Test, D.Rank17)
+
+colnames(O.Rank17)[colnames(O.Rank17)=="Home.Team"] <- "Visitor.Team"
+colnames(O.Rank17)[colnames(O.Rank17)=="Home.O.Rank"] <- "Visitor.O.Rank"
+
+colnames(D.Rank17)[colnames(D.Rank17)=="Home.Team"] <- "Visitor.Team"
+colnames(D.Rank17)[colnames(D.Rank17)=="Home.D.Rank"] <- "Visitor.D.Rank"
+
+join3 = left_join(Test2, O.Rank17)
+join4 = left_join(Test3, D.Rank17)
+```
+
+```{r}
+O.Stats18 = read_xlsx("2018OStats.xlsx", skip = 1)
+D.Stats18 = read_xlsx("2018DStats.xlsx", skip = 1)
+
+O.Rank18 = data.frame(O.Stats18$School, O.Stats18$O.Rank18)
+colnames(O.Rank18)[colnames(O.Rank18)=="O.Stats18.School"] <- "Home.Team"
+colnames(O.Rank18)[colnames(O.Rank18)=="O.Stats18.O.Rank18"] <- "Home.O.Rank"
+
+D.Rank18 = data.frame(D.Stats18$School, D.Stats18$D.Rank18)
+colnames(D.Rank18)[colnames(D.Rank18)=="D.Stats18.School"] <- "Home.Team"
+colnames(D.Rank18)[colnames(D.Rank18)=="D.Stats18.D.Rank18"] <- "Home.D.Rank"
+
+Data18 = filter(Game.Data.V1, str_detect(Date, '2018'))
+
+join5 = left_join(Data18, O.Rank18)
+join6 = left_join(Test5, D.Rank18)
+
+colnames(O.Rank18)[colnames(O.Rank18)=="Home.Team"] <- "Visitor.Team"
+colnames(O.Rank18)[colnames(O.Rank18)=="Home.O.Rank"] <- "Visitor.O.Rank"
+
+colnames(D.Rank18)[colnames(D.Rank18)=="Home.Team"] <- "Visitor.Team"
+colnames(D.Rank18)[colnames(D.Rank18)=="Home.D.Rank"] <- "Visitor.D.Rank"
+
+join7 = left_join(Test6, O.Rank18)
+join8 = left_join(Test7, D.Rank18)
+
+Game.Data.V2 = rbind(Test4, Test8)
+```
+
 
