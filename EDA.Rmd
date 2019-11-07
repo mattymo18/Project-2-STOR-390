@@ -1,0 +1,21 @@
+---
+title: "EDA"
+author: "Daniel Barlow"
+date: "November 7, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(readxl)
+df <- read.csv("Final_Game_Data.csv")
+```
+
+```{r}
+df$Home_balance <- df$Home_RushAtt/(df$Home_RushAtt + df$Home_PassAtt)
+df$Away_balance <- df$Away_RushAtt/(df$Away_RushAtt + df$Away_PassAtt)
+```
+
