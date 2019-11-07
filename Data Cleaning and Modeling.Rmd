@@ -23,6 +23,48 @@ Predictions = read.csv("Predictions.csv")
 Cleaning
 
 ```{r}
+Game.Stats$School <- as.character(Game.Stats$School)
+Game.Stats$School[Game.Stats$School == "Miami (FL)"] <- "Miami Flordia"
+
+Game.Stats$Opponent <- as.character(Game.Stats$Opponent)
+Game.Stats$Opponent[Game.Stats$Opponent == "Miami (FL)"] <- "Miami Flordia"
+
+Game.Stats$School <- as.character(Game.Stats$School)
+Game.Stats$School[Game.Stats$School == "Miami (OH)"] <- "Miami Ohio"
+
+Game.Stats$Opponent <- as.character(Game.Stats$Opponent)
+Game.Stats$Opponent[Game.Stats$Opponent == "Miami (OH)"] <- "Miami Ohio"
+
+Game.Stats$School <- as.character(Game.Stats$School)
+Game.Stats$School[Game.Stats$School == "North Carolina State"] <- "NC State"
+
+Game.Stats$Opponent <- as.character(Game.Stats$Opponent)
+Game.Stats$Opponent[Game.Stats$Opponent == "North Carolina State"] <- "NC State"
+
+Game.Stats$School <- as.character(Game.Stats$School)
+Game.Stats$School[Game.Stats$School == "Florida International"] <- "FIU"
+
+Game.Stats$Opponent <- as.character(Game.Stats$Opponent)
+Game.Stats$Opponent[Game.Stats$Opponent == "Florida International"] <- "FIU"
+
+Game.Results$Home.Team <- as.character(Game.Results$Home.Team)
+Game.Results$Home.Team[Game.Results$Home.Team == "Florida Intl"] <- "FIU"
+
+Game.Results$Visitor.Team <- as.character(Game.Results$Visitor.Team)
+Game.Results$Visitor.Team[Game.Results$Visitor.Team == "Florida Intl"] <- "FIU"
+
+Game.Stats$School <- as.character(Game.Stats$School)
+Game.Stats$School[Game.Stats$School == "Pittsburgh"] <- "Pitt"
+
+Game.Stats$Opponent <- as.character(Game.Stats$Opponent)
+Game.Stats$Opponent[Game.Stats$Opponent == "Pittsburgh"] <- "Pitt"
+
+Game.Results$Home.Team <- as.character(Game.Results$Home.Team)
+Game.Results$Home.Team[Game.Results$Home.Team == "Pittsburgh"] <- "Pitt"
+
+Game.Results$Visitor.Team <- as.character(Game.Results$Visitor.Team)
+Game.Results$Visitor.Team[Game.Results$Visitor.Team == "Pittsburgh"] <- "Pitt"
+
 Game.Stats.Away <- Game.Stats %>% 
   filter(X == "@")
 Game.Stats.Home <- Game.Stats %>% 
@@ -108,6 +150,7 @@ join7 = left_join(join6, O.Rank18)
 join8 = left_join(join7, D.Rank18)
 
 Game.Data.V2 = rbind(join4, join8)
+#only team missing is Mercer for the predictions, still need to change Pitt in predictions data
 ```
 
 
