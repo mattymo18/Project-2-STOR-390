@@ -24,16 +24,22 @@ Cleaning
 
 ```{r}
 Game.Stats$School <- as.character(Game.Stats$School)
-Game.Stats$School[Game.Stats$School == "Miami (FL)"] <- "Miami Flordia"
+Game.Stats$School[Game.Stats$School == "Miami (FL)"] <- "Miami"
 
 Game.Stats$Opponent <- as.character(Game.Stats$Opponent)
-Game.Stats$Opponent[Game.Stats$Opponent == "Miami (FL)"] <- "Miami Flordia"
+Game.Stats$Opponent[Game.Stats$Opponent == "Miami (FL)"] <- "Miami"
 
 Game.Stats$School <- as.character(Game.Stats$School)
 Game.Stats$School[Game.Stats$School == "Miami (OH)"] <- "Miami Ohio"
 
 Game.Stats$Opponent <- as.character(Game.Stats$Opponent)
 Game.Stats$Opponent[Game.Stats$Opponent == "Miami (OH)"] <- "Miami Ohio"
+
+Game.Results$Home.Team <- as.character(Game.Results$Home.Team)
+Game.Results$Home.Team[Game.Results$Home.Team == "Miami Florida"] <- "Miami"
+
+Game.Results$Visitor.Team <- as.character(Game.Results$Visitor.Team)
+Game.Results$Visitor.Team[Game.Results$Visitor.Team == "Miami Florida"] <- "Miami"
 
 Game.Stats$School <- as.character(Game.Stats$School)
 Game.Stats$School[Game.Stats$School == "North Carolina State"] <- "NC State"
