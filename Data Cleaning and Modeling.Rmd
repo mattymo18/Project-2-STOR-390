@@ -151,6 +151,7 @@ join8 = left_join(join7, D.Rank18)
 
 Game.Data.V2 = rbind(join4, join8)
 #only team missing is Mercer for the predictions, still need to change Pitt in predictions data
+write.csv(Game.Data.V2, file = "Final_Game_Data.csv")
 ```
 
 
