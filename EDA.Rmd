@@ -11,11 +11,33 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(dplyr)
 library(readxl)
+library(randomForest)
 df <- read.csv("Final_Game_Data.csv")
+Predictions <- read.csv("Predictions.csv")
 ```
 
 ```{r}
 df$Home_balance <- df$Home_RushAtt/(df$Home_RushAtt + df$Home_PassAtt)
 df$Away_balance <- df$Away_RushAtt/(df$Away_RushAtt + df$Away_PassAtt)
+df <- na.omit(df)
+df <- df %>% filter(Home.Team == Predictions$Home.Team | Home.Team == Predictions$Visitor.Team)
+```
+
+```{r}
+set.seed(1305)
+size = floor(.7*nrow(df))
+train.idx = sample(seq_len(nrow(df)), size = size)
+train = df[train.idx,]
+test = df[-train.idx,]
+```
+
+```{r}
+mod1 = glm(Home_X.1 ~ ., data = train, family = "binomial", control = list(maxit = 50))
+
+model = randomForest(x=dplyr::select(train,-Home_X.1),
+                     y=as.factor(train$Home_X.1),
+                     xtest=dplyr::select(test,-Home_X.1),
+                     ytest=as.factor(test$Home_X.1),
+                     type="classification")
 ```
 
