@@ -20,7 +20,15 @@ Predictions <- read.csv("Predictions.csv")
 df$Home_balance <- df$Home_RushAtt/(df$Home_RushAtt + df$Home_PassAtt)
 df$Away_balance <- df$Away_RushAtt/(df$Away_RushAtt + df$Away_PassAtt)
 df <- na.omit(df)
-df <- df %>% filter(Home.Team == Predictions$Home.Team | Home.Team == Predictions$Visitor.Team)
+df$Home.Team <- as.character(df$Home.Team)
+df$Visitor.Team <- as.character(df$Visitor.Team)
+Predictions$Home.Team <- as.character(Predictions$Home.Team)
+Predictions$Visitor.Team <- as.character(Predictions$Visitor.Team)
+Predictions$Home.Team[Predictions$Home.Team == "Pittsburgh"] <- "Pitt"
+Predictions$Visitor.Team[Predictions$Visitor.Team == "Pittsburgh"] <- "Pitt"
+df1 <- df %>% filter(Home.Team %in% Predictions$Home.Team | Home.Team %in% Predictions$Visitor.Team && Visitor.Team %in% Predictions$Home.Team | Visitor.Team %in% Predictions$Visitor.Team)
+df1$Date <- as.character.Date(df1$Date)
+df1 <- df1[ , c(-1, -3)]
 ```
 
 ```{r}
