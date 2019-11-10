@@ -29,6 +29,8 @@ Predictions$Visitor.Team[Predictions$Visitor.Team == "Pittsburgh"] <- "Pitt"
 df1 <- df %>% filter(Home.Team %in% Predictions$Home.Team | Home.Team %in% Predictions$Visitor.Team && Visitor.Team %in% Predictions$Home.Team | Visitor.Team %in% Predictions$Visitor.Team)
 df1$Date <- as.character.Date(df1$Date)
 df1 <- df1[ , c(-1, -3)]
+df1$Home.Team <- factor(df1$Home.Team)
+df1$Visitor.Team <- factor(df1$Visitor.Team)
 ```
 
 ```{r}
@@ -47,5 +49,6 @@ model = randomForest(x=dplyr::select(train,-Home_X.1),
                      xtest=dplyr::select(test,-Home_X.1),
                      ytest=as.factor(test$Home_X.1),
                      type="classification")
+#idk why this isn't working, non of the variables have 53 categories if you check the str
 ```
 
