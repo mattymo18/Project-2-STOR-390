@@ -45,12 +45,20 @@ test = df[-train.idx, -c(1:4, 25, 45:49)]
 GLM
 ```{r}
 glm.model = glm(Home_X.1 ~ ., data = train, family = "binomial", control = list(maxit = 50))
+probs.full = glm.model %>% 
+  predict(test, type = "response")
+predicted.classes <- ifelse(probs.full > 0.5, 1, 0)
+observed.class = test$Home_X.1
+mean(predicted.classes == observed.classes)
 ```
 
 
 The most commonly used penalized regression include:
 
 ridge regression: variables with minor contribution have their coefficients close to zero. However, all the variables are incorporated in the model. This is useful when all variables need to be incorporated in the model according to domain knowledge.
+```{r}
+
+```
 
 lasso regression: the coefficients of some less contributive variables are forced to be exactly zero. Only the most significant variables are kept in the final model.
 ```{r}
@@ -62,7 +70,7 @@ x.train <- model.matrix(Home_X.1~., train)[, -1]
 y.train <- ifelse(train$Home_X.1 == "W", 1, 0)
 x.test <- model.matrix(Home_X.1 ~., lasso.test)[, -1]
 y.test <- ifelse(lasso.test$Home_X.1 == "W", 1, 0)
-lasso.lambda = cv.glmnet(x.train, y.train, family = "binomial", alpha = 1)
+lasso.lambda =cv.glmnet(x.train, y.train, family = "binomial", alpha = 1)
 # plot(lasso.lambda)
 lasso.lambda$lambda.min
 lasso.model = glmnet(x.train, y.train, family = "binomial", alpha = 1, lambda = lasso.lambda$lambda.min)
