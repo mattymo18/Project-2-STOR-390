@@ -56,9 +56,6 @@ mean(predicted.classes == observed.classes)
 The most commonly used penalized regression include:
 
 ridge regression: variables with minor contribution have their coefficients close to zero. However, all the variables are incorporated in the model. This is useful when all variables need to be incorporated in the model according to domain knowledge.
-```{r}
-
-```
 
 lasso regression: the coefficients of some less contributive variables are forced to be exactly zero. Only the most significant variables are kept in the final model.
 ```{r}
