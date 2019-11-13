@@ -37,8 +37,8 @@ df1$Visitor.Team <- factor(df1$Visitor.Team)
 set.seed(1305)
 size = floor(.7*nrow(df))
 train.idx = sample(seq_len(nrow(df)), size = size)
-train = df[train.idx,]
-test = df[-train.idx,]
+train = df[train.idx, -c(1:4, 25, 45:49)] #takes out any variables that have characters associated to them as well as spread, home.score, visitor.score, total
+test = df[-train.idx, -c(1:4, 25, 45:49)]
 ```
 
 ```{r}
@@ -49,6 +49,7 @@ model = randomForest(x=dplyr::select(train,-Home_X.1),
                      xtest=dplyr::select(test,-Home_X.1),
                      ytest=as.factor(test$Home_X.1),
                      type="classification")
+importance(model)
 #idk why this isn't working, non of the variables have 53 categories if you check the str
 ```
 
