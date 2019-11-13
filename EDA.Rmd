@@ -50,6 +50,6 @@ model = randomForest(x=dplyr::select(train,-Home_X.1),
                      ytest=as.factor(test$Home_X.1),
                      type="classification")
 importance(model)
-#so obviously extra points mdae and attempted are clearly important because those are exac
+#so obviously extra points mdae and attempted are clearly important because those only happen after Tds, but I think it is great to see that the variables we added seem to be important
 ```
 
