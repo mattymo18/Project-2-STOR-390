@@ -1,0 +1,117 @@
+---
+title: "EDA"
+author: "Daniel Barlow"
+date: "November 7, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(readxl)
+library(randomForest)
+library(glmnet)
+df <- read.csv("Final_Game_Data.csv")
+Predictions <- read.csv("Predictions.csv")
+```
+
+```{r}
+df$Home_balance <- df$Home_RushAtt/(df$Home_RushAtt + df$Home_PassAtt)
+df$Away_balance <- df$Away_RushAtt/(df$Away_RushAtt + df$Away_PassAtt)
+df <- na.omit(df)
+df$Home.Team <- as.character(df$Home.Team)
+df$Visitor.Team <- as.character(df$Visitor.Team)
+Predictions$Home.Team <- as.character(Predictions$Home.Team)
+Predictions$Visitor.Team <- as.character(Predictions$Visitor.Team)
+Predictions$Home.Team[Predictions$Home.Team == "Pittsburgh"] <- "Pitt"
+Predictions$Visitor.Team[Predictions$Visitor.Team == "Pittsburgh"] <- "Pitt"
+# df1 <- df %>% filter(Home.Team %in% Predictions$Home.Team | Home.Team %in% Predictions$Visitor.Team && Visitor.Team %in% Predictions$Home.Team | Visitor.Team %in% Predictions$Visitor.Team)
+# df1$Date <- as.character.Date(df1$Date)
+# df1 <- df1[ , c(-1, -3)]
+# df1$Home.Team <- factor(df1$Home.Team)
+# df1$Visitor.Team <- factor(df1$Visitor.Team)
+```
+
+```{r}
+set.seed(1305)
+size = floor(.7*nrow(df))
+train.idx = sample(seq_len(nrow(df)), size = size)
+train = df[train.idx, -c(1:4, 25, 45:49)] #takes out any variables that have characters associated to them as well as spread, home.score, visitor.score, total
+test = df[-train.idx, -c(1:4, 25, 45:49)]
+```
+
+GLM
+```{r}
+glm.model = glm(Home_X.1 ~ ., data = train, family = "binomial", control = list(maxit = 50))
+probs.full = glm.model %>% 
+  predict(test, type = "response")
+predicted.classes <- ifelse(probs.full > 0.5, 1, 0)
+observed.class = test$Home_X.1
+mean(predicted.classes == observed.classes)
+```
+
+
+The most commonly used penalized regression include:
+
+ridge regression: variables with minor contribution have their coefficients close to zero. However, all the variables are incorporated in the model. This is useful when all variables need to be incorporated in the model according to domain knowledge.
+```{r}
+ridge.test = df[-train.idx, -c(1:4, 25, 45:49)]
+ridge.test$Home_X.1 <- ifelse(test$Home_X.1 == "W", 1, 0)
+
+x.train <- model.matrix(Home_X.1~., train)[, -1]
+y.train <- ifelse(train$Home_X.1 == "W", 1, 0)
+x.test <- model.matrix(Home_X.1 ~., ridge.test)[, -1]
+y.test <- ifelse(ridge.test$Home_X.1 == "W", 1, 0)
+ridge.lambda =cv.glmnet(x.train, y.train, alpha = 1)
+plot(ridge.lambda)
+ridge.lambda$lambda.min
+ridge.model = glmnet(x.train, y.train, family = "binomial", alpha = 1, lambda = ridge.lambda$lambda.min)
+
+probs.ridge <- ridge.model %>% 
+  predict(s='ridge.lambda$lambda.min', newx=x.test, type="response")
+quantile(probs.ridge)
+predicted.classes <- ifelse(probs.ridge > 0.5, "1", "0")
+observed.classes <- ridge.test$Home_X.1
+mean(predicted.classes == observed.classes)
+
+```
+
+lasso regression: the coefficients of some less contributive variables are forced to be exactly zero. Only the most significant variables are kept in the final model.
+```{r}
+set.seed(1305)
+lasso.test = df[-train.idx, -c(1:4, 25, 45:49)]
+lasso.test$Home_X.1 <- ifelse(test$Home_X.1 == "W", 1, 0)
+#build model matrixes
+x.train <- model.matrix(Home_X.1~., train)[, -1]
+y.train <- ifelse(train$Home_X.1 == "W", 1, 0)
+x.test <- model.matrix(Home_X.1 ~., lasso.test)[, -1]
+y.test <- ifelse(lasso.test$Home_X.1 == "W", 1, 0)
+lasso.lambda =cv.glmnet(x.train, y.train, family = "binomial", alpha = 1)
+# plot(lasso.lambda)
+lasso.lambda$lambda.min
+lasso.model = glmnet(x.train, y.train, family = "binomial", alpha = 1, lambda = lasso.lambda$lambda.min)
+# coef(lasso.lambda)
+probs.lasso <- lasso.model %>% 
+  predict(s='lasso.lambda$lambda.min', newx=x.test, type="response")
+quantile(probs.lasso)
+predicted.classes <- ifelse(probs.lasso > 0.5, "1", "0")
+observed.classes <- lasso.test$Home_X.1
+mean(predicted.classes == observed.classes)
+```
+
+elastic net regression: the combination of ridge and lasso regression. It shrinks some coefficients toward zero (like ridge regression) and set some coefficients to exactly zero (like lasso regression)
+
+
+Random Forest
+```{r}
+rf.model = randomForest(x=dplyr::select(train,-Home_X.1),
+                     y=as.factor(train$Home_X.1),
+                     xtest=dplyr::select(test,-Home_X.1),
+                     ytest=as.factor(test$Home_X.1),
+                     type="classification")
+importance(rf.model)
+#so obviously extra points mdae and attempted are clearly important because those only happen after Tds, but I think it is great to see that the variables we added seem to be important
+```
+
