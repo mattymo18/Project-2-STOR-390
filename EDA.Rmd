@@ -12,6 +12,7 @@ library(tidyverse)
 library(dplyr)
 library(readxl)
 library(randomForest)
+library(glmnet)
 df <- read.csv("Final_Game_Data.csv")
 Predictions <- read.csv("Predictions.csv")
 ```
@@ -41,15 +42,50 @@ train = df[train.idx, -c(1:4, 25, 45:49)] #takes out any variables that have cha
 test = df[-train.idx, -c(1:4, 25, 45:49)]
 ```
 
+GLM
 ```{r}
-mod1 = glm(Home_X.1 ~ ., data = train, family = "binomial", control = list(maxit = 50))
+glm.model = glm(Home_X.1 ~ ., data = train, family = "binomial", control = list(maxit = 50))
+```
 
-model = randomForest(x=dplyr::select(train,-Home_X.1),
+
+The most commonly used penalized regression include:
+
+ridge regression: variables with minor contribution have their coefficients close to zero. However, all the variables are incorporated in the model. This is useful when all variables need to be incorporated in the model according to domain knowledge.
+
+lasso regression: the coefficients of some less contributive variables are forced to be exactly zero. Only the most significant variables are kept in the final model.
+```{r}
+set.seed(1305)
+lasso.test = df[-train.idx, -c(1:4, 25, 45:49)]
+lasso.test$Home_X.1 <- ifelse(test$Home_X.1 == "W", 1, 0)
+#build model matrixes
+x.train <- model.matrix(Home_X.1~., train)[, -1]
+y.train <- ifelse(train$Home_X.1 == "W", 1, 0)
+x.test <- model.matrix(Home_X.1 ~., lasso.test)[, -1]
+y.test <- ifelse(lasso.test$Home_X.1 == "W", 1, 0)
+lasso.lambda = cv.glmnet(x.train, y.train, family = "binomial", alpha = 1)
+# plot(lasso.lambda)
+lasso.lambda$lambda.min
+lasso.model = glmnet(x.train, y.train, family = "binomial", alpha = 1, lambda = lasso.lambda$lambda.min)
+# coef(lasso.lambda)
+probs.lasso <- lasso.model %>% 
+  predict(s='lasso.lambda$lambda.min', newx=x.test, type="response")
+quantile(probs.lasso)
+predicted.classes <- ifelse(probs.lasso > 0.5, "1", "0")
+observed.classes <- lasso.test$Home_X.1
+mean(predicted.classes == observed.classes)
+```
+
+elastic net regression: the combination of ridge and lasso regression. It shrinks some coefficients toward zero (like ridge regression) and set some coefficients to exactly zero (like lasso regression)
+
+
+Random Forst
+```{r}
+rf.model = randomForest(x=dplyr::select(train,-Home_X.1),
                      y=as.factor(train$Home_X.1),
                      xtest=dplyr::select(test,-Home_X.1),
                      ytest=as.factor(test$Home_X.1),
                      type="classification")
-importance(model)
+importance(rf.model)
 #so obviously extra points mdae and attempted are clearly important because those only happen after Tds, but I think it is great to see that the variables we added seem to be important
 ```
 
