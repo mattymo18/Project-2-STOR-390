@@ -161,3 +161,7 @@ write.csv(Game.Data.V2, file = "Final_Game_Data.csv")
 ```
 
 
+```{r}
+Data19 = filter(Game.Data.V1, str_detect(Date, '2019'))
+```
+
