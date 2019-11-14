@@ -55,7 +55,6 @@ observed.classes = glm.test$Home_X.1
 mean(predicted.classes == observed.classes)
 ```
 
-
 The most commonly used penalized regression include:
 
 ridge regression: variables with minor contribution have their coefficients close to zero. However, all the variables are incorporated in the model. This is useful when all variables need to be incorporated in the model according to domain knowledge.
@@ -96,7 +95,6 @@ lasso.model = glmnet(x.train, y.train, family = "binomial", alpha = 1, lambda = 
 # coef(lasso.lambda)
 probs.lasso <- lasso.model %>% 
   predict(s='lasso.lambda$lambda.min', newx=x.test, type="response")
-quantile(probs.lasso)
 predicted.classes <- ifelse(probs.lasso > 0.5, "1", "0")
 observed.classes <- lasso.test$Home_X.1
 mean(predicted.classes == observed.classes)
