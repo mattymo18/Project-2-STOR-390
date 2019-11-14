@@ -1,0 +1,144 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+if(!require(dplyr)) {install.packages("dplyr", repos="http://cran.us.r-project.org"); library(dplyr)}
+if(!require(zoo)) {install.packages("zoo", repos="http://cran.us.r-project.org"); library(zoo)}
+if(!require(data.table)) {install.packages("data.table", repos="http://cran.us.r-project.org"); library(data.table)}
+if(!require(MASS)) {install.packages("MASS", repos="http://cran.us.r-project.org"); library(MASS)}
+if(!require(randomForest)) {install.packages("randomForest", repos="http://cran.us.r-project.org"); library(randomForest)}
+if(!require(Ckmeans.1d.dp)) {install.packages("Ckmeans.1d.dp", repos="http://cran.us.r-project.org"); library(Ckmeans.1d.dp)}
+if(!require(DAAG)) {install.packages("DAAG", repos="http://cran.us.r-project.org"); library(DAAG)}
+if(!require(e1071)) {install.packages("e1071", repos="http://cran.us.r-project.org"); library(e1071)}
+if(!require(splines)) {install.packages("splines", repos="http://cran.us.r-project.org"); library(splines)}
+if(!require(readr)) {install.packages("readr", repos="http://cran.us.r-project.org"); library(readr)}
+if(!require(class)) {install.packages("class", repos="http://cran.us.r-project.org"); library(class)}
+if(!require(xgboost)) {install.packages("xgboost", repos="http://cran.us.r-project.org"); library(xgboost)}
+if(!require(mlr)) {install.packages("mlr", repos="http://cran.us.r-project.org"); library(mlr)}
+if(!require(parallelMap)) {install.packages("parallelMap", repos="http://cran.us.r-project.org"); library(parallelMap)}
+if(!require(parallel)) {install.packages("parallel", repos="http://cran.us.r-project.org"); library(parallel)}
+if(!require(cluster)) {install.packages("cluster", repos="http://cran.us.r-project.org"); library(cluster)}
+#if(!require(factoextra)) {install.packages("factoextra", repos="http://cran.us.r-project.org"); library(factoextra)}
+```
+
+```{r, include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(readxl)
+library(randomForest)
+library(glmnet)
+```
+
+```{r}
+df <- read.csv("C:/Users/dcbarlow/Downloads/Final_Game_Data.csv")
+Predictions <- read.csv("C:/Users/dcbarlow/Downloads/Predictions.csv")
+```
+
+```{r}
+df$Home_balance <- df$Home_RushAtt/(df$Home_RushAtt + df$Home_PassAtt)
+df$Away_balance <- df$Away_RushAtt/(df$Away_RushAtt + df$Away_PassAtt)
+df <- na.omit(df)
+df$Home.Team <- as.character(df$Home.Team)
+df$Visitor.Team <- as.character(df$Visitor.Team)
+Predictions$Home.Team <- as.character(Predictions$Home.Team)
+Predictions$Visitor.Team <- as.character(Predictions$Visitor.Team)
+Predictions$Home.Team[Predictions$Home.Team == "Pittsburgh"] <- "Pitt"
+Predictions$Visitor.Team[Predictions$Visitor.Team == "Pittsburgh"] <- "Pitt"
+```
+
+```{r}
+set.seed(1305)
+
+size = floor(.7*nrow(df))
+train.idx = sample(seq_len(nrow(df)), size = size)
+train = df[train.idx, -c(1:4, 25, 45:49)] 
+test = df[-train.idx, -c(1:4, 25, 45:49)]
+```
+
+```{r}
+rf.model = randomForest(x=dplyr::select(train,-Home_X.1),
+                     y=as.factor(train$Home_X.1),
+                     xtest=dplyr::select(test,-Home_X.1),
+                     ytest=as.factor(test$Home_X.1),
+                     type="classification")
+
+layout(matrix(c(1,2),nrow=1),
+       width=c(4,1)) 
+par(mar=c(5,4,4,0)) #No margin on the right side
+plot(rf.model, log="y")
+par(mar=c(5,0,4,2)) #No margin on the left side
+plot(c(0,1),type="n", axes=F, xlab="", ylab="")
+legend("top", colnames(rf.model$err.rate),col=1:4,cex=0.8,fill=1:4)
+```
+
+```{r}
+rf.model$test$confusion
+```
+
+    
+```{r}
+#confusion matrix given in homework solutions from Brendan Brown
+confusion <- function(yhat, y, quietly = FALSE){
+  
+  if(!quietly)
+    message("yhat is the vector of predicted outcomes, possibly a factor.\n
+          Sensitivity = (first level predicted) / (first level actual) \n
+          Specificity = (second level predicted) / (second level actual)")
+  
+  if(!is.factor(y) & is.factor(yhat))
+    y <- as.factor(y)
+  
+  if(!all.equal(levels(yhat), levels(y)))
+    stop("Factor levels of yhat and y do not match.")
+  
+  confusion_mat <- table(yhat, y, deparse.level = 2)
+  stats <- data.frame(sensitivity = confusion_mat[1, 1]/sum(confusion_mat[, 1]),
+                                 specificity = confusion_mat[2, 2]/sum(confusion_mat[, 2]))
+  
+  return(list(confusion_mat = confusion_mat, stats = stats))
+}
+```
+
+```{r}
+mlda <- lda(Home_X.1 ~ ., data = train)
+plda <- predict(mlda, newdata = test)
+confusion(yhat = plda$class, y = test$Home_X.1, quietly = TRUE)
+```
+
+```{r}
+set.seed(1305)
+
+size = floor(.7*nrow(df))
+train.idx = sample(seq_len(nrow(df)), size = size)
+train = df[train.idx, -c(1:4, 25, 47)] 
+test = df[-train.idx, -c(1:4, 25, 47)]
+```
+
+```{r}
+train <- train[, -c()]
+mod1 <- randomForest(Home.Score ~., data = train)
+
+#plot(randomForest(Home.Score ~., data = train))
+
+oob.err=double(mod1$mtry)
+test.err=double(mod1$mtry)
+
+#mtry is no of Variables randomly chosen at each split
+for(mtry in 1:16) 
+{
+  rf=randomForest(Home.Score ~., data = train, mtry=mtry, ntree=400) 
+  oob.err[mtry] = rf$mse[400] #Error of all Trees fitted
+  
+  pred<-predict(rf,test) #Predictions on Test Set for each Tree
+  test.err[mtry]= with(test, mean( (Home.Score - pred)^2)) #Mean Squared Test Error
+  
+  cat(mtry," ") #printing the output to the console
+  
+}
+
+importance(mod1)
+```
+
