@@ -72,6 +72,34 @@ Game.Results$Home.Team[Game.Results$Home.Team == "Pittsburgh"] <- "Pitt"
 Game.Results$Visitor.Team <- as.character(Game.Results$Visitor.Team)
 Game.Results$Visitor.Team[Game.Results$Visitor.Team == "Pittsburgh"] <- "Pitt"
 
+no.mercer = subset(Game.Stats, Opponent != "Mercer")
+no.alabamastate = subset(no.mercer, Opponent != "Alabama State")
+Game.Stats = no.alabamastate
+
+Game.Stats$School = as.character(Game.Stats$School)
+Game.Stats$School[Game.Stats$School == "Akron"] <- "Mercer"
+
+Game.Stats$Opponent <- as.character(Game.Stats$Opponent)
+Game.Stats$Opponent[Game.Stats$Opponent == "Akron"] <- "Mercer"
+
+Game.Results$Home.Team <- as.character(Game.Results$Home.Team)
+Game.Results$Home.Team[Game.Results$Home.Team == "Akron"] <- "Mercer"
+
+Game.Results$Visitor.Team <- as.character(Game.Results$Visitor.Team)
+Game.Results$Visitor.Team[Game.Results$Visitor.Team == "Akron"] <- "Mercer"
+
+Game.Stats$School = as.character(Game.Stats$School)
+Game.Stats$School[Game.Stats$School == "UTSA"] <- "Alabama State"
+
+Game.Stats$Opponent <- as.character(Game.Stats$Opponent)
+Game.Stats$Opponent[Game.Stats$Opponent == "UTSA"] <- "Alabama State"
+
+Game.Results$Home.Team <- as.character(Game.Results$Home.Team)
+Game.Results$Home.Team[Game.Results$Home.Team == "UTSA"] <- "Alabama State"
+
+Game.Results$Visitor.Team <- as.character(Game.Results$Visitor.Team)
+Game.Results$Visitor.Team[Game.Results$Visitor.Team == "UTSA"] <- "Alabama State"
+
 Game.Stats.Away <- Game.Stats %>% 
   filter(X == "@")
 Game.Stats.Home <- Game.Stats %>% 
@@ -91,6 +119,18 @@ Game.Stats.Away.1 <-  Game.Stats.Away %>%
   select(c(-1, -4, -5))
 varname.away = 'Away'
 names(Game.Stats.Away.1)[4:ncol(Game.Stats.Away.1)] <- paste0(rep(varname.away), "_", c(names(Game.Stats.Away.1[, 4:23])))
+ 
+#this is fucked but this is how we need to get Alabama State Stats for 2019
+Alabama.state.19 <- Game.Stats.Away.1 %>% 
+  filter(Visitor.Team == "Alabama State")
+Alabama.state.19 <- filter(Alabama.state.19, str_detect(Date, '2019'))
+Alabama.state.data <- Alabama.state.19 %>% 
+  group_by(Visitor.Team) %>% 
+  summarise_all(list(Avg = mean)) %>% 
+  select(-c(2:4))
+Alabama.state.data[1, 13] <- 66
+Alabama.state.data[1, 16] <- 50
+
 
 varname.home <-  'Home'
 Game.Stats.V2 <- full_join(Game.Stats.Home.1, Game.Stats.Away.1)
@@ -410,6 +450,12 @@ Florida.Home <- Pred.data %>%
   group_by(Home.Team) %>%
   summarise_all(list(Avg = mean)) %>% 
   select(c(1, 4:21))
+
+Mercer.Away <- Pred.data %>% 
+  filter(Visitor.Team == "Mercer") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
 ```
 
 ```{r}
@@ -418,7 +464,7 @@ Predictions$Home.Team <- as.character(Predictions$Home.Team)
 Predictions$Visitor.Team[Predictions$Visitor.Team == "Pittsburgh"] <- "Pitt"
 Predictions$Home.Team[Predictions$Home.Team == "Pittsburgh"] <- "Pitt"
 
-AwayStats <- rbind(Clemson.Away, Duke.Away, FIU.Away, Florida.State.Away, Georgia.Tech.Away, Kentucky.Away, Liberty.Away, Louisville.Away, Miami.Away, NC.State.Away, North.Carolina.Away, Notre.Dame.Away, Syracuse.Away, Virginia.Away, Virginia.Tech.Away, Wake.Away, Boston.College.Away, Georgia.Away, Pitt.Away)
+AwayStats <- rbind(Clemson.Away, Duke.Away, FIU.Away, Florida.State.Away, Georgia.Tech.Away, Kentucky.Away, Liberty.Away, Louisville.Away, Miami.Away, NC.State.Away, North.Carolina.Away, Notre.Dame.Away, Syracuse.Away, Virginia.Away, Virginia.Tech.Away, Wake.Away, Boston.College.Away, Georgia.Away, Pitt.Away, Alabama.state.data, Mercer.Away)
 AwayStats <- AwayStats[, -20]
 
 AP <- left_join(Predictions, AwayStats, by = "Visitor.Team")
