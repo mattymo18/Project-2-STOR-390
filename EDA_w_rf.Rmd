@@ -197,16 +197,16 @@ importance(rf1.visitor.score)
 
 
 ```{r}
-OStats19 <- read_csv("C:/Users/barlo/Downloads/2019 Offense.csv", 
-    skip = 1)
-OStats19 <- OStats19[, c(1,2)]
-
-DStats19 <- read_csv("C:/Users/barlo/Downloads/2019 Defense.csv", 
-    skip = 1)
-DStats19 <- DStats19[, c(1,2)]
-
-rdf <- left_join(OStats19, DStats19, by = "School")
-names(rdf) <- c("O.Rank", "School", "D.Rank")
-write.csv(rdf, file = "Ranking.csv")
+# OStats19 <- read_csv("C:/Users/barlo/Downloads/2019 Offense.csv", 
+#     skip = 1)
+# OStats19 <- OStats19[, c(1,2)]
+# 
+# DStats19 <- read_csv("C:/Users/barlo/Downloads/2019 Defense.csv", 
+#     skip = 1)
+# DStats19 <- DStats19[, c(1,2)]
+# 
+# rdf <- left_join(OStats19, DStats19, by = "School")
+# names(rdf) <- c("O.Rank", "School", "D.Rank")
+# write.csv(rdf, file = "Ranking.csv")
 ```
 
