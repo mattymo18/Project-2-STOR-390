@@ -21,7 +21,7 @@ step.poisson1 <- step(poisson1, trace =0)
 poisson2 <- glm(formula = step.poisson1, data = train.home)
 summary(poisson2)
 predict(poisson2, newdata = test.home)
-modelr::rmse(poisson2, data = test.home)
+modelr::mae(poisson2, data = test.home)
 ```
 
 ```{r}
@@ -30,6 +30,6 @@ step.poisson2 <- step(poisson3, trace =0)
 poisson4 <- glm(formula = step.poisson2, data = train.visitor)
 summary(poisson4)
 predict(poisson4, newdata = test.visitor)
-modelr::rmse(poisson4, data = test.visitor)
+modelr::mae(poisson4, data = test.visitor)
 ```
 
