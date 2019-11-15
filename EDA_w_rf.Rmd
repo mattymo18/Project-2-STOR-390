@@ -48,9 +48,6 @@ summary(glm.model)
 coef(glm.model)
 probs.full = glm.model %>% 
   predict(Predictions.test, type = "response")
-predicted.classes <- ifelse(probs.full > 0.5, 1, 0)
-observed.classes = glm.test$Home_X.1
-mean(predicted.classes == observed.classes)
 ```
 
 The most commonly used penalized regression include:
@@ -69,11 +66,9 @@ plot(ridge.lambda)
 ridge.lambda$lambda.min
 ridge.model = glmnet(x.train, y.train, family = "binomial", alpha = 0, lambda = ridge.lambda$lambda.min)
 probs.ridge <- ridge.model %>% 
-  predict(s='ridge.lambda$lambda.min', newx=x.test, type="response")
+  predict(s='ridge.lambda$lambda.min', newx=data.matrix(Predictions.test[, -c(1:7)]), type="response")
 quantile(probs.ridge)
 predicted.classes <- ifelse(probs.ridge > 0.5, "1", "0")
-observed.classes <- ridge.test$Home_X.1
-mean(predicted.classes == observed.classes)
 ```
 
 lasso regression: the coefficients of some less contributive variables are forced to be exactly zero. Only the most significant variables are kept in the final model.
@@ -92,11 +87,37 @@ lasso.lambda$lambda.min
 lasso.model = glmnet(x.train, y.train, family = "binomial", alpha = 1, lambda = lasso.lambda$lambda.min)
 # coef(lasso.lambda)
 probs.lasso <- lasso.model %>% 
-  predict(s='lasso.lambda$lambda.min', newx=x.test, type="response")
+  predict(s='lasso.lambda$lambda.min', newx=data.matrix(Predictions.test[, -c(1:7)]), type="response")
 predicted.classes <- ifelse(probs.lasso > 0.5, "1", "0")
-observed.classes <- lasso.test$Home_X.1
-mean(predicted.classes == observed.classes)
 ```
+
+Random Forest
+```{r}
+train.rf.class <- df[train.idx, -c(1:4, 24, 25, 44, 45:49)]
+test.rf.class <-  df[-train.idx, -c(1:4, 24, 25, 44, 45:49)]
+
+rf.model = randomForest(x=dplyr::select(train.rf.class,-Home_X.1),
+                     y=as.factor(train.rf.class$Home_X.1),
+                     xtest=dplyr::select(test.rf.class,-Home_X.1),
+                     ytest=as.factor(test.rf.class$Home_X.1),
+                     type="classification", keep.forest = T)
+
+layout(matrix(c(1,2),nrow=1),
+       width=c(4,1)) 
+par(mar=c(5,4,4,0)) #No margin on the right side
+plot(rf.model, log="y")
+par(mar=c(5,0,4,2)) #No margin on the left side
+plot(c(0,1),type="n", axes=F, xlab="", ylab="")
+legend("top", colnames(rf.model$err.rate),col=1:4,cex=0.8,fill=1:4)
+
+rf.model$test$confusion
+predict(rf.model, newdata=data.matrix(Predictions.test[, -c(1:7)]))
+```
+ 
+
+
+Score
+
 
 Linear
 ```{r}
