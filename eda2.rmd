@@ -135,7 +135,10 @@ lm2.Visitor.score <- lm(formula = Step.Visitor.lm1, data = train.score.visitor)
 summary(lm2.Visitor.score)
 predict(lm2.Visitor.score, newdata = test.score.visitor)
 modelr::rmse(lm2.Visitor.score, data = test.score.visitor)
+```
 
-#predict(lm2.Home.score, newdata = Predictions.test)
+lasso for scores
+```{r}
+
 ```
 
