@@ -129,7 +129,6 @@ predict(lm2.Visitor.score, newdata = Predictions.test)
 ```
 
 Poisson
-
 ```{r}
 poisson1.home.score <- glm(Home.Score ~., data = train.Home.score, family = poisson) 
 step.poisson1.home.score <- step(poisson1.home.score, trace =0)
@@ -192,6 +191,7 @@ predict(rf1.visitor.score, Predictions.test)
 
 importance(rf1.visitor.score)
 ```
+
 
 
 
