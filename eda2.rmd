@@ -117,17 +117,25 @@ importance(rf.model)
 
 linear models
 ```{r}
-train.score = df[train.idx, -c(1, 3, 5, 24, 44, 47:49)]
-test.score = df[-train.idx, -c(1, 3, 5, 24, 44, 47:49)]
+train.score.home = df[train.idx, -c(1, 3, 5, 24, 25, 40, 44, 47:49)]
+test.score.home = df[-train.idx, -c(1, 3, 5, 24, 25, 40, 44, 47:49)]
+train.score.visitor = df[train.idx, -c(1, 3, 5, 24, 25, 39, 44, 47:49)]
+test.score.visitor = df[-train.idx, -c(1, 3, 5, 24, 25, 39, 44, 47:49)]
 
-lm1.Home.score <- lm(Home.Score ~ ., data = train.score[, c(1, 3:20, 40, 42, 43)])
-step(lm1.Home.score, trace = 0)
-lm2.Home.score <- lm(Home.Score ~ Home_PassAtt + Home_PassTD + Home_RushYds + Home_RushTD + Home_XPA + Home_FGM + Home_FGPercent + Home.O.Rank, data = train.score[, c(1, 3:20, 40, 42, 43)])
+lm1.Home.score <- lm(Home.Score ~ ., data = train.score.home)
+Step.Home.lm1 <-  step(lm1.Home.score, trace = 0)
+lm2.Home.score <- lm(formula = Step.Home.lm1, data = train.score.home)
 summary(lm2.Home.score)
-predict(lm2.Home.score, newdata = test.score)
-modelr::rmse(lm2.Home.score, data = test.score)
+predict(lm2.Home.score, newdata = test.score.home)
+modelr::rmse(lm2.Home.score, data = test.score.home)
 
-lm1.Visit.score <- lm(Home.Score ~ ., data = train.score[, c(2, )])
-predict(lm2.Home.score, newdata = Predictions.test)
+lm1.Visitor.score <- lm(Visitor.Score ~ ., data = train.score.visitor)
+Step.Visitor.lm1 <-  step(lm1.Visitor.score, trace = 0)
+lm2.Visitor.score <- lm(formula = Step.Visitor.lm1, data = train.score.visitor)
+summary(lm2.Visitor.score)
+predict(lm2.Visitor.score, newdata = test.score.visitor)
+modelr::rmse(lm2.Visitor.score, data = test.score.visitor)
+
+#predict(lm2.Home.score, newdata = Predictions.test)
 ```
 
