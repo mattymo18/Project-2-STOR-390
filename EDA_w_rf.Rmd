@@ -148,6 +148,7 @@ predict(poisson2.visitor.score, newdata = test.Visitor.score)
 modelr::rmse(poisson2.visitor.score, data = test.Visitor.score)
 ```
 
+
 Random Forest
 ```{r}
 #randomForest(Home.Score ~ ., train.score[, c(3:20, 41, 43, 44, 47)], type = "regression")
@@ -171,6 +172,10 @@ which.min(test.err)
 
 predict(rf, Predictions.test)
 ```
+
+
+
+
 
 
 ```{r}
