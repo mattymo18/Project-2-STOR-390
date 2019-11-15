@@ -18,6 +18,7 @@ Import Data
 Game.Results = read.csv("GameResults.csv")
 Game.Stats = read.csv("GameStats.csv")
 Predictions = read.csv("Predictions.csv")
+Rankings <- read.csv("Ranking.csv")
 ```
 
 Cleaning
@@ -434,6 +435,22 @@ names(Predictions.test) <- c("Date","Home.Team","Visitor.Team","Spread","Total",
  "Home_RushTD",    "Home_XPM",       "Home_XPA",       "Home_XPPercent",
 "Home_FGM",       "Home_FGA",       "Home_FGPercent", "Home_KickPts",  
  "Home_Fum",       "Home_Int"  )
+
+Home.Rankings <- Rankings %>% 
+  rename(Home.O.Rank = O.Rank) %>% 
+  rename(Home.D.Rank = D.Rank) %>% 
+  rename(Home.Team = School) %>% 
+  select(c(2:4))
+Home.Rankings$Home.Team = as.character(Home.Rankings$Home.Team)
+Visitor.Rankings <- Rankings %>% 
+  rename(Visitor.O.Rank = O.Rank) %>% 
+  rename(Visitor.D.Rank = D.Rank) %>% 
+  rename(Visitor.Team = School) %>% 
+  select(c(2:4))
+Visitor.Rankings$Visitor.Team = as.character(Visitor.Rankings$Visitor.Team)
+
+Predictions.test.rank <- left_join(Predictions.test, Visitor.Rankings)
+Predicitions.with.rank <- left_join(Predictions.test.rank, Home.Rankings)
 #write.csv(Predictions.test, "Predictions_test.csv")
 ```
 

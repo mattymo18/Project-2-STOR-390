@@ -127,6 +127,8 @@ linear models
 ```{r}
 Predictions.test$Home_balance <- Predictions.test$Home_RushAtt/(Predictions.test$Home_RushAtt + Predictions.test$Home_PassAtt)
 Predictions.test$Away_balance <- Predictions.test$Away_RushAtt/(Predictions.test$Away_RushAtt + Predictions.test$Away_PassAtt)
+
+
   
 train.score = df[train.idx, -c(1, 3, 5, 24, 44, 47:49)]
 test.score = df[-train.idx, -c(1, 3, 5, 24, 44, 47:49)]
