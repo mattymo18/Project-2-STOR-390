@@ -425,6 +425,15 @@ AP <- left_join(Predictions, AwayStats, by = "Visitor.Team")
 HomeStats <- rbind(Clemson.Home, Duke.Home, FIU.Home, Florida.State.Home, Georgia.Tech.Home, Kentucky.Home, Liberty.Home, Louisville.Home, Miami.Home, NC.State.Home, North.Carolina.Home, Notre.Dame.Home, Syracuse.Home, Virginia.Home, Virginia.Tech.Home, Wake.Home, Boston.College.Home, Georgia.Home, Pitt.Home, South.Carolina.Home, Florida.Home)
 
 Predictions.test <- left_join(AP, HomeStats, by = "Home.Team")
-Predictions.test
+names(Predictions.test) <- c("Date","Home.Team","Visitor.Team","Spread","Total","Result", "Away_PassCmp",   "Away_PassAtt",   "Away_PassPct",   "Away_PassYds",   "Away_PassTD",    "Away_RushAtt",  
+ "Away_RushYds",   "Away_RushAvg",   "Away_RushTD",    "Away_XPM",      
+"Away_XPA",       "Away_XPPercent", "Away_FGM",       "Away_FGA",      
+ "Away_FGPercent", "Away_KickPts",   "Away_Fum",       "Away_Int",      
+ "Home_PassCmp",   "Home_PassAtt",   "Home_PassPct",   "Home_PassYds",  
+ "Home_PassTD",    "Home_RushAtt",   "Home_RushYds",   "Home_RushAvg",  
+ "Home_RushTD",    "Home_XPM",       "Home_XPA",       "Home_XPPercent",
+"Home_FGM",       "Home_FGA",       "Home_FGPercent", "Home_KickPts",  
+ "Home_Fum",       "Home_Int"  )
+write.csv(Predictions.test, "Predictions_test.csv")
 ```
 

@@ -114,10 +114,19 @@ importance(rf.model)
 #so obviously extra points mdae and attempted are clearly important because those only happen after Tds, but I think it is great to see that the variables we added seem to be important
 ```
 
-model
+linear models
 ```{r}
 train.score = df[train.idx, -c(1, 3, 5, 24, 44, 47:49)]
 test.score = df[-train.idx, -c(1, 3, 5, 24, 44, 47:49)]
 
+lm1.Home.score <- lm(Home.Score ~ ., data = train.score[, c(1, 3:20, 40)])
+step(lm1.score, trace = 0)
+lm2.Home.score <- lm(Home.Score ~ Home_PassAtt + Home_PassTD + Home_RushYds + Home_RushTD + Home_XPA + Home_FGM + Home_FGPercent, data = train.score[, c(1, 3:20, 40)])
+summary(lm2.Home.score)
+predict(lm2.Home.score, newdata = test.score)
+modelr::rmse(lm2.Home.score, data = test.score)
+
+
+predict(lm2.Home.score, newdata = Predictions.test)
 ```
 
