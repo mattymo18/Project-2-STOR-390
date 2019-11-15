@@ -158,11 +158,11 @@ test.err=double(18)
 
 #mtry is no of Variables randomly chosen at each split
 for(mtry in 1:18) {
-  rf=randomForest(Home.Score ~ ., train.Home.score[, c(3:20, 40, 47)], type = "regression", mtry=mtry, ntree=400) 
+  rf1.home.score=randomForest(Home.Score ~ ., train.Home.score[, c(3:45)], type = "regression", mtry=mtry, ntree=400) 
   oob.err[mtry] = rf$mse[400] #Error of all Trees fitted
   
-  pred<-predict(rf, test.Home.score[, c(3:20, 40, 47)]) #Predictions on Test Set for each Tree
-  test.err[mtry]= with(test.Home.score[, c(3:20, 40, 47)], mean( (Home.Score - pred)^2)) #Mean Squared Test Error
+  pred<-predict(rf1.home.score, test.Home.score[, c(3:45)]) #Predictions on Test Set for each Tree
+  test.err[mtry]= with(test.Home.score[, c(3:45)], mean( (Home.Score - pred)^2)) #Mean Squared Test Error
   
   cat(mtry," ") #printing the output to the console
   
@@ -170,7 +170,25 @@ for(mtry in 1:18) {
 which.min(test.err)
 #test.err
 
-predict(rf, Predictions.test)
+predict(rf1.home.score, Predictions.test)
+importance(rf1.home.score)
+
+
+for(mtry in 1:18) {
+  rf1.visitor.score=randomForest(Visitor.Score ~ ., train.Visitor.score[, c(3:45)], type = "regression", mtry=mtry, ntree=400) 
+  oob.err[mtry] = rf$mse[400] #Error of all Trees fitted
+  
+  pred<-predict(rf1.visitor.score, test.Visitor.score[, c(3:45)]) #Predictions on Test Set for each Tree
+  test.err[mtry]= with(test.Visitor.score[, c(3:45)], mean( (Visitor.Score - pred)^2)) #Mean Squared Test Error
+  
+  cat(mtry," ") #printing the output to the console
+  
+}
+which.min(test.err)
+#test.err
+
+predict(rf1.visitor.score, Predictions.test)
+importance(rf1.visitor.score)
 ```
 
 
