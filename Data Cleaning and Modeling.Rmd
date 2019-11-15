@@ -434,6 +434,6 @@ names(Predictions.test) <- c("Date","Home.Team","Visitor.Team","Spread","Total",
  "Home_RushTD",    "Home_XPM",       "Home_XPA",       "Home_XPPercent",
 "Home_FGM",       "Home_FGA",       "Home_FGPercent", "Home_KickPts",  
  "Home_Fum",       "Home_Int"  )
-write.csv(Predictions.test, "Predictions_test.csv")
+#write.csv(Predictions.test, "Predictions_test.csv")
 ```
 
