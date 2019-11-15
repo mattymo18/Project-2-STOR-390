@@ -500,6 +500,25 @@ Predictions.with.rank <- left_join(Predictions.test.rank, Home.Rankings)
 
 Predictions.with.rank$Home_balance <- Predictions.with.rank$Home_RushAtt/(Predictions.with.rank$Home_RushAtt + Predictions.with.rank$Home_PassAtt)
 Predictions.with.rank$Away_balance <- Predictions.with.rank$Away_RushAtt/(Predictions.with.rank$Away_RushAtt + Predictions.with.rank$Away_PassAtt)
-#write.csv(Predictions.with.rank, "Predictions_test.csv")
+
+Predictions.with.rank$Visitor.O.Rank[Predictions.with.rank$Visitor.Team == "Alabama State"] <- 116
+Predictions.with.rank$Visitor.D.Rank[Predictions.with.rank$Visitor.Team == "Alabama State"] <- 101
+Predictions.with.rank$Visitor.O.Rank[Predictions.with.rank$Visitor.Team == "Mercer"] <- 130
+Predictions.with.rank$Visitor.D.Rank[Predictions.with.rank$Visitor.Team == "Mercer"] <- 129
+
+Predictions.with.rank$Visitor.O.Rank[Predictions.with.rank$Visitor.Team == "NC State"] <- 106
+Predictions.with.rank$Visitor.D.Rank[Predictions.with.rank$Visitor.Team == "NC State"] <- 75
+Predictions.with.rank$Home.O.Rank[Predictions.with.rank$Home.Team == "NC State"] <- 106
+Predictions.with.rank$Home.D.Rank[Predictions.with.rank$Home.Team == "NC State"] <- 75
+
+Predictions.with.rank$Visitor.O.Rank[Predictions.with.rank$Visitor.Team == "Miami"] <- 66
+Predictions.with.rank$Visitor.D.Rank[Predictions.with.rank$Visitor.Team == "Miami"] <- 20
+
+Predictions.with.rank$Visitor.O.Rank[Predictions.with.rank$Visitor.Team == "Louisville"] <- 49
+Predictions.with.rank$Visitor.D.Rank[Predictions.with.rank$Visitor.Team == "Louisville"] <- 111
+
+Predictions.with.rank$Home.O.Rank[Predictions.with.rank$Home.Team == "FIU"] <- 86
+Predictions.with.rank$Home.D.Rank[Predictions.with.rank$Home.Team == "FIU"] <- 58
+write.csv(Predictions.with.rank, "Predictions_test.csv")
 ```
 
