@@ -147,6 +147,45 @@ predict(poisson2.visitor.score, newdata = test.Visitor.score)
 modelr::rmse(poisson2.visitor.score, data = test.Visitor.score)
 ```
 
+Lasso
+```{r}
+lasso.train.Home.score <- train.Home.score[, -c(1, 2)]
+lasso.train.Home.score <- as.data.frame(sapply(lasso.train.Home.score, as.numeric))
+lasso.test.Home.score <- test.Home.score[, -c(1, 2)]
+lasso.test.Home.score <- as.data.frame(sapply(lasso.test.Home.score, as.numeric))
+
+set.seed(1305)
+x.train.home <- model.matrix(Home.Score~., lasso.train.Home.score)[, -1]
+y.train.home <- lasso.train.Home.score$Home.Score
+x.test.home <- model.matrix(Home.Score~., lasso.test.Home.score)[, -1]
+y.test.home <- lasso.test.Home.score$Home.Score
+lasso1.home.score = cv.glmnet(x.train.home, y.train.home, family = "poisson", alpha = 1)
+# plot(optimal.lam.home)
+# plot(lasso1.home.score)
+coef(lasso1.home.score, s='lambda.min')
+# summary(lasso1.home.score)
+predict(lasso1.home.score, newx = data.matrix(Predictions.test[, -c(1:7)]), type = "response", s = 'lambda.min')
+
+
+lasso.train.Visitor.score <- train.Visitor.score[, -c(1, 2)]
+lasso.train.Visitor.score <- as.data.frame(sapply(lasso.train.Visitor.score, as.numeric))
+lasso.test.Visitor.score <- test.Visitor.score[, -c(1, 2)]
+lasso.test.Visitor.score <- as.data.frame(sapply(lasso.test.Visitor.score, as.numeric))
+
+set.seed(1305)
+x.train.visitor <- model.matrix(Visitor.Score~., lasso.train.Visitor.score)[, -1]
+y.train.visitor <- lasso.train.Visitor.score$Visitor.Score
+x.test.visitor <- model.matrix(Visitor.Score~., lasso.test.Visitor.score)[, -1]
+y.test.visitor <- lasso.test.Visitor.score$Visitor.Score
+lasso1.visitor.score = cv.glmnet(x.train.visitor, y.train.visitor, family = "poisson", alpha = 1)
+# plot(optimal.lam.home)
+# plot(lasso1.home.score)
+coef(lasso1.visitor.score, s='lambda.min')
+# summary(lasso1.home.score)
+predict(lasso1.visitor.score, newx = data.matrix(Predictions.test[, -c(1:7)]), type = "response", s = 'lambda.min')
+```
+
+
 
 Random Forest
 ```{r}
