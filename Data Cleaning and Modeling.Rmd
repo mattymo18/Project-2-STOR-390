@@ -75,7 +75,7 @@ Game.Stats.Away <- Game.Stats %>%
   filter(X == "@")
 Game.Stats.Home <- Game.Stats %>% 
   filter(X == "")
-#not sure what to do with this yet but we can figure it out
+#not sure what to do with this yet but we can figure it out also just realized there are no stats for mercer
 Game.Stats.N <- Game.Stats %>% 
   filter(X == "N")
 
@@ -169,5 +169,262 @@ Setting up data for predictions
 Data19 <-  filter(Game.Data.V1, str_detect(Date, '2019'))
 
 Pred.data <- Data19[, -c(2, 23, 44:48)]
-#no mercer, only one clemson game, may have to look into using games from 2018 and avg those in too. 
+#no mercer, only one clemson game, may have to look into using games from 2018 and avg those in too.
+Virginia.Home <- Pred.data %>% 
+  filter(Home.Team == "Virginia") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+Virginia.Away <- Pred.data %>% 
+  filter(Visitor.Team == "Virginia") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+Clemson.Home <- Pred.data %>% 
+  filter(Home.Team == "Clemson") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+Clemson.Away <- Pred.data %>% 
+  filter(Visitor.Team == "Clemson") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+Wake.Home <- Pred.data %>% 
+  filter(Home.Team == "Wake Forest") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+Wake.Away <- Pred.data %>% 
+  filter(Visitor.Team == "Wake Forest") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+Duke.Home <- Pred.data %>% 
+  filter(Home.Team == "Duke") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+Duke.Away <- Pred.data %>% 
+  filter(Visitor.Team == "Duke") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+Syracuse.Home <- Pred.data %>% 
+  filter(Home.Team == "Syracuse") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+Syracuse.Away <- Pred.data %>% 
+  filter(Visitor.Team == "Syracuse") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+Florida.State.Home <- Pred.data %>% 
+  filter(Home.Team == "Florida State") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+Florida.State.Away <- Pred.data %>% 
+  filter(Visitor.Team == "Florida State") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+Georgia.Tech.Home <- Pred.data %>% 
+  filter(Home.Team == "Georgia Tech") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+Georgia.Tech.Away <- Pred.data %>% 
+  filter(Visitor.Team == "Georgia Tech") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+Virginia.Tech.Home <- Pred.data %>% 
+  filter(Home.Team == "Virginia Tech") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+Virginia.Tech.Away <- Pred.data %>% 
+  filter(Visitor.Team == "Virginia Tech") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+NC.State.Home <- Pred.data %>% 
+  filter(Home.Team == "NC State") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+NC.State.Away <- Pred.data %>% 
+  filter(Visitor.Team == "NC State") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+Louisville.Home <- Pred.data %>% 
+  filter(Home.Team == "Louisville") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+Louisville.Away <- Pred.data %>% 
+  filter(Visitor.Team == "Louisville") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+Notre.Dame.Home <- Pred.data %>% 
+  filter(Home.Team == "Notre Dame") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+Notre.Dame.Away <- Pred.data %>% 
+  filter(Visitor.Team == "Notre Dame") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+Boston.College.Home <- Pred.data %>% 
+  filter(Home.Team == "Boston College") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+Boston.College.Away <- Pred.data %>% 
+  filter(Visitor.Team == "Boston College") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+FIU.Home <- Pred.data %>% 
+  filter(Home.Team == "FIU") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+FIU.Away <- Pred.data %>% 
+  filter(Visitor.Team == "FIU") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+Miami.Home <- Pred.data %>% 
+  filter(Home.Team == "Miami") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+Miami.Away <- Pred.data %>% 
+  filter(Visitor.Team == "Miami") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+North.Carolina.Home <- Pred.data %>% 
+  filter(Home.Team == "North Carolina") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+North.Carolina.Away <- Pred.data %>% 
+  filter(Visitor.Team == "North Carolina") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+Liberty.Home <- Pred.data %>% 
+  filter(Home.Team == "Liberty") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+Liberty.Away <- Pred.data %>% 
+  filter(Visitor.Team == "Liberty") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+Kentucky.Home <- Pred.data %>% 
+  filter(Home.Team == "Kentucky") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+Kentucky.Away <- Pred.data %>% 
+  filter(Visitor.Team == "Kentucky") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+Georgia.Away <- Pred.data %>% 
+  filter(Visitor.Team == "Georgia") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+Georgia.Home <- Pred.data %>% 
+  filter(Home.Team == "Georgia") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+Pitt.Home <- Pred.data %>% 
+  filter(Home.Team == "Pitt") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+Pitt.Away <- Pred.data %>% 
+  filter(Visitor.Team == "Pitt") %>%
+  group_by(Visitor.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 23:41))
+
+South.Carolina.Home <- Pred.data %>% 
+  filter(Home.Team == "South Carolina") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
+
+Florida.Home <- Pred.data %>% 
+  filter(Home.Team == "Florida") %>%
+  group_by(Home.Team) %>%
+  summarise_all(list(Avg = mean)) %>% 
+  select(c(1, 4:21))
 ```
+
+```{r}
+Predictions$Visitor.Team <- as.character(Predictions$Visitor.Team)
+Predictions$Home.Team <- as.character(Predictions$Home.Team)
+Predictions$Visitor.Team[Predictions$Visitor.Team == "Pittsburgh"] <- "Pitt"
+Predictions$Home.Team[Predictions$Home.Team == "Pittsburgh"] <- "Pitt"
+
+AwayStats <- rbind(Clemson.Away, Duke.Away, FIU.Away, Florida.State.Away, Georgia.Tech.Away, Kentucky.Away, Liberty.Away, Louisville.Away, Miami.Away, NC.State.Away, North.Carolina.Away, Notre.Dame.Away, Syracuse.Away, Virginia.Away, Virginia.Tech.Away, Wake.Away, Boston.College.Away, Georgia.Away, Pitt.Away)
+AwayStats <- AwayStats[, -20]
+
+AP <- left_join(Predictions, AwayStats, by = "Visitor.Team")
+
+HomeStats <- rbind(Clemson.Home, Duke.Home, FIU.Home, Florida.State.Home, Georgia.Tech.Home, Kentucky.Home, Liberty.Home, Louisville.Home, Miami.Home, NC.State.Home, North.Carolina.Home, Notre.Dame.Home, Syracuse.Home, Virginia.Home, Virginia.Tech.Home, Wake.Home, Boston.College.Home, Georgia.Home, Pitt.Home, South.Carolina.Home, Florida.Home)
+
+Predictions.test <- left_join(AP, HomeStats, by = "Home.Team")
+Predictions.test
+```
+

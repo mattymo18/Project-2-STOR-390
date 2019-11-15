@@ -190,11 +190,59 @@ summary {
 Game.Stats = read.csv(&quot;GameStats.csv&quot;)
 Predictions = read.csv(&quot;Predictions.csv&quot;)</code></pre>
 <p>Cleaning</p>
-<pre class="r"><code>Game.Stats.Away &lt;- Game.Stats %&gt;% 
+<pre class="r"><code>Game.Stats$School &lt;- as.character(Game.Stats$School)
+Game.Stats$School[Game.Stats$School == &quot;Miami (FL)&quot;] &lt;- &quot;Miami&quot;
+
+Game.Stats$Opponent &lt;- as.character(Game.Stats$Opponent)
+Game.Stats$Opponent[Game.Stats$Opponent == &quot;Miami (FL)&quot;] &lt;- &quot;Miami&quot;
+
+Game.Stats$School &lt;- as.character(Game.Stats$School)
+Game.Stats$School[Game.Stats$School == &quot;Miami (OH)&quot;] &lt;- &quot;Miami Ohio&quot;
+
+Game.Stats$Opponent &lt;- as.character(Game.Stats$Opponent)
+Game.Stats$Opponent[Game.Stats$Opponent == &quot;Miami (OH)&quot;] &lt;- &quot;Miami Ohio&quot;
+
+Game.Results$Home.Team &lt;- as.character(Game.Results$Home.Team)
+Game.Results$Home.Team[Game.Results$Home.Team == &quot;Miami Florida&quot;] &lt;- &quot;Miami&quot;
+
+Game.Results$Visitor.Team &lt;- as.character(Game.Results$Visitor.Team)
+Game.Results$Visitor.Team[Game.Results$Visitor.Team == &quot;Miami Florida&quot;] &lt;- &quot;Miami&quot;
+
+Game.Stats$School &lt;- as.character(Game.Stats$School)
+Game.Stats$School[Game.Stats$School == &quot;North Carolina State&quot;] &lt;- &quot;NC State&quot;
+
+Game.Stats$Opponent &lt;- as.character(Game.Stats$Opponent)
+Game.Stats$Opponent[Game.Stats$Opponent == &quot;North Carolina State&quot;] &lt;- &quot;NC State&quot;
+
+Game.Stats$School &lt;- as.character(Game.Stats$School)
+Game.Stats$School[Game.Stats$School == &quot;Florida International&quot;] &lt;- &quot;FIU&quot;
+
+Game.Stats$Opponent &lt;- as.character(Game.Stats$Opponent)
+Game.Stats$Opponent[Game.Stats$Opponent == &quot;Florida International&quot;] &lt;- &quot;FIU&quot;
+
+Game.Results$Home.Team &lt;- as.character(Game.Results$Home.Team)
+Game.Results$Home.Team[Game.Results$Home.Team == &quot;Florida Intl&quot;] &lt;- &quot;FIU&quot;
+
+Game.Results$Visitor.Team &lt;- as.character(Game.Results$Visitor.Team)
+Game.Results$Visitor.Team[Game.Results$Visitor.Team == &quot;Florida Intl&quot;] &lt;- &quot;FIU&quot;
+
+Game.Stats$School &lt;- as.character(Game.Stats$School)
+Game.Stats$School[Game.Stats$School == &quot;Pittsburgh&quot;] &lt;- &quot;Pitt&quot;
+
+Game.Stats$Opponent &lt;- as.character(Game.Stats$Opponent)
+Game.Stats$Opponent[Game.Stats$Opponent == &quot;Pittsburgh&quot;] &lt;- &quot;Pitt&quot;
+
+Game.Results$Home.Team &lt;- as.character(Game.Results$Home.Team)
+Game.Results$Home.Team[Game.Results$Home.Team == &quot;Pittsburgh&quot;] &lt;- &quot;Pitt&quot;
+
+Game.Results$Visitor.Team &lt;- as.character(Game.Results$Visitor.Team)
+Game.Results$Visitor.Team[Game.Results$Visitor.Team == &quot;Pittsburgh&quot;] &lt;- &quot;Pitt&quot;
+
+Game.Stats.Away &lt;- Game.Stats %&gt;% 
   filter(X == &quot;@&quot;)
 Game.Stats.Home &lt;- Game.Stats %&gt;% 
   filter(X == &quot;&quot;)
-#not sure what to do with this yet but we can figure it out
+#not sure what to do with this yet but we can figure it out also just realized there are no stats for mercer
 Game.Stats.N &lt;- Game.Stats %&gt;% 
   filter(X == &quot;N&quot;)
 
@@ -211,13 +259,17 @@ varname.away = 'Away'
 names(Game.Stats.Away.1)[4:ncol(Game.Stats.Away.1)] &lt;- paste0(rep(varname.away), &quot;_&quot;, c(names(Game.Stats.Away.1[, 4:23])))
 
 varname.home &lt;-  'Home'
-Game.Stats.V2 &lt;- na.omit(full_join(Game.Stats.Home.1, Game.Stats.Away.1))</code></pre>
+Game.Stats.V2 &lt;- full_join(Game.Stats.Home.1, Game.Stats.Away.1)</code></pre>
 <pre><code>## Joining, by = c(&quot;Home.Team&quot;, &quot;Date&quot;, &quot;Visitor.Team&quot;)</code></pre>
-<pre><code>## Warning: Column `Home.Team` joining factors with different levels, coercing
-## to character vector</code></pre>
-<pre><code>## Warning: Column `Visitor.Team` joining factors with different levels,
-## coercing to character vector</code></pre>
-<pre class="r"><code>names(Game.Stats.V2)[4:23] &lt;- paste0(rep(varname.home), &quot;_&quot;, c(names(Game.Stats.Home.1[, 4:23])))
+<pre class="r"><code>Game.Stats.V2[is.na(Game.Stats.V2)] &lt;- 0</code></pre>
+<pre><code>## Warning in `[&lt;-.factor`(`*tmp*`, thisvar, value = 0): invalid factor level,
+## NA generated
+
+## Warning in `[&lt;-.factor`(`*tmp*`, thisvar, value = 0): invalid factor level,
+## NA generated</code></pre>
+<pre class="r"><code>Game.Stats.V2 &lt;- Game.Stats.V2 %&gt;% 
+  filter(!is.na(Away_X.1))
+names(Game.Stats.V2)[4:23] &lt;- paste0(rep(varname.home), &quot;_&quot;, c(names(Game.Stats.Home.1[, 4:23])))
 
 #Game.Results cleaning
 Game.Results.V2 &lt;- Game.Results %&gt;% 
@@ -225,12 +277,8 @@ Game.Results.V2 &lt;- Game.Results %&gt;%
 
 Game.Data.V1 &lt;- na.omit(left_join(Game.Stats.V2, Game.Results.V2))</code></pre>
 <pre><code>## Joining, by = c(&quot;Home.Team&quot;, &quot;Date&quot;, &quot;Visitor.Team&quot;)</code></pre>
-<pre><code>## Warning: Column `Home.Team` joining character vector and factor, coercing
-## into character vector</code></pre>
 <pre><code>## Warning: Column `Date` joining factors with different levels, coercing to
 ## character vector</code></pre>
-<pre><code>## Warning: Column `Visitor.Team` joining character vector and factor,
-## coercing into character vector</code></pre>
 <pre class="r"><code>O.Stats17 = read_xlsx(&quot;2017OStats.xlsx&quot;, skip = 1)</code></pre>
 <pre><code>## New names:
 ## * Att -&gt; Att...6
@@ -257,11 +305,11 @@ colnames(D.Rank17)[colnames(D.Rank17)==&quot;D.Stats17.D.Rank17&quot;] &lt;- &qu
 
 Data17 = filter(Game.Data.V1, str_detect(Date, '2017'))
 
-Test = left_join(Data17, O.Rank17)</code></pre>
+join = left_join(Data17, O.Rank17)</code></pre>
 <pre><code>## Joining, by = &quot;Home.Team&quot;</code></pre>
 <pre><code>## Warning: Column `Home.Team` joining character vector and factor, coercing
 ## into character vector</code></pre>
-<pre class="r"><code>Test2 = left_join(Test, D.Rank17)</code></pre>
+<pre class="r"><code>join2 = left_join(join, D.Rank17)</code></pre>
 <pre><code>## Joining, by = &quot;Home.Team&quot;</code></pre>
 <pre><code>## Warning: Column `Home.Team` joining character vector and factor, coercing
 ## into character vector</code></pre>
@@ -271,11 +319,11 @@ colnames(O.Rank17)[colnames(O.Rank17)==&quot;Home.O.Rank&quot;] &lt;- &quot;Visi
 colnames(D.Rank17)[colnames(D.Rank17)==&quot;Home.Team&quot;] &lt;- &quot;Visitor.Team&quot;
 colnames(D.Rank17)[colnames(D.Rank17)==&quot;Home.D.Rank&quot;] &lt;- &quot;Visitor.D.Rank&quot;
 
-Test3 = left_join(Test2, O.Rank17)</code></pre>
+join3 = left_join(join2, O.Rank17)</code></pre>
 <pre><code>## Joining, by = &quot;Visitor.Team&quot;</code></pre>
 <pre><code>## Warning: Column `Visitor.Team` joining character vector and factor,
 ## coercing into character vector</code></pre>
-<pre class="r"><code>Test4 = left_join(Test3, D.Rank17)</code></pre>
+<pre class="r"><code>join4 = left_join(join3, D.Rank17)</code></pre>
 <pre><code>## Joining, by = &quot;Visitor.Team&quot;</code></pre>
 <pre><code>## Warning: Column `Visitor.Team` joining character vector and factor,
 ## coercing into character vector</code></pre>
@@ -305,11 +353,11 @@ colnames(D.Rank18)[colnames(D.Rank18)==&quot;D.Stats18.D.Rank18&quot;] &lt;- &qu
 
 Data18 = filter(Game.Data.V1, str_detect(Date, '2018'))
 
-Test5 = left_join(Data18, O.Rank18)</code></pre>
+join5 = left_join(Data18, O.Rank18)</code></pre>
 <pre><code>## Joining, by = &quot;Home.Team&quot;</code></pre>
 <pre><code>## Warning: Column `Home.Team` joining character vector and factor, coercing
 ## into character vector</code></pre>
-<pre class="r"><code>Test6 = left_join(Test5, D.Rank18)</code></pre>
+<pre class="r"><code>join6 = left_join(join5, D.Rank18)</code></pre>
 <pre><code>## Joining, by = &quot;Home.Team&quot;</code></pre>
 <pre><code>## Warning: Column `Home.Team` joining character vector and factor, coercing
 ## into character vector</code></pre>
@@ -319,15 +367,706 @@ colnames(O.Rank18)[colnames(O.Rank18)==&quot;Home.O.Rank&quot;] &lt;- &quot;Visi
 colnames(D.Rank18)[colnames(D.Rank18)==&quot;Home.Team&quot;] &lt;- &quot;Visitor.Team&quot;
 colnames(D.Rank18)[colnames(D.Rank18)==&quot;Home.D.Rank&quot;] &lt;- &quot;Visitor.D.Rank&quot;
 
-Test7 = left_join(Test6, O.Rank18)</code></pre>
+join7 = left_join(join6, O.Rank18)</code></pre>
 <pre><code>## Joining, by = &quot;Visitor.Team&quot;</code></pre>
 <pre><code>## Warning: Column `Visitor.Team` joining character vector and factor,
 ## coercing into character vector</code></pre>
-<pre class="r"><code>Test8 = left_join(Test7, D.Rank18)</code></pre>
+<pre class="r"><code>join8 = left_join(join7, D.Rank18)</code></pre>
 <pre><code>## Joining, by = &quot;Visitor.Team&quot;</code></pre>
 <pre><code>## Warning: Column `Visitor.Team` joining character vector and factor,
 ## coercing into character vector</code></pre>
-<pre class="r"><code>total = rbind(Test4, Test8)</code></pre>
+<pre class="r"><code>Game.Data.V2 = rbind(join4, join8)
+#only team missing is Mercer for the predictions, still need to change Pitt in predictions data
+write.csv(Game.Data.V2, file = &quot;Final_Game_Data.csv&quot;)</code></pre>
+<p>Setting up data for predictions</p>
+<pre class="r"><code>Data19 &lt;-  filter(Game.Data.V1, str_detect(Date, '2019'))
+
+Pred.data &lt;- Data19[, -c(2, 23, 44:48)]
+#no mercer, only one clemson game, may have to look into using games from 2018 and avg those in too.
+Virginia.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;Virginia&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Virginia.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;Virginia&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Clemson.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;Clemson&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Clemson.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;Clemson&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Wake.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;Wake Forest&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Wake.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;Wake Forest&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Duke.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;Duke&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Duke.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;Duke&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Syracuse.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;Syracuse&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Syracuse.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;Syracuse&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Florida.State.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;Florida State&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Florida.State.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;Florida State&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Georgia.Tech.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;Georgia Tech&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Georgia.Tech.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;Georgia Tech&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Virginia.Tech.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;Virginia Tech&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Virginia.Tech.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;Virginia Tech&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>NC.State.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;NC State&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>NC.State.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;NC State&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Louisville.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;Louisville&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Louisville.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;Louisville&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Notre.Dame.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;Notre Dame&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Notre.Dame.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;Notre Dame&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Boston.College.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;Boston College&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Boston.College.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;Boston College&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>FIU.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;FIU&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>FIU.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;FIU&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Miami.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;Miami&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Miami.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;Miami&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>North.Carolina.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;North Carolina&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>North.Carolina.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;North Carolina&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Liberty.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;Liberty&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Liberty.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;Liberty&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Kentucky.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;Kentucky&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Kentucky.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;Kentucky&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Georgia.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;Georgia&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Georgia.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;Georgia&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Pitt.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;Pitt&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Pitt.Away &lt;- Pred.data %&gt;% 
+  filter(Visitor.Team == &quot;Pitt&quot;) %&gt;%
+  group_by(Visitor.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 23:41))</code></pre>
+<pre><code>## Warning in mean.default(Home.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>South.Carolina.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;South Carolina&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Florida.Home &lt;- Pred.data %&gt;% 
+  filter(Home.Team == &quot;Florida&quot;) %&gt;%
+  group_by(Home.Team) %&gt;%
+  summarise_all(list(Avg = mean)) %&gt;% 
+  select(c(1, 4:21))</code></pre>
+<pre><code>## Warning in mean.default(Visitor.Team): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Home_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre><code>## Warning in mean.default(Away_X.1): argument is not numeric or logical:
+## returning NA</code></pre>
+<pre class="r"><code>Predictions$Visitor.Team &lt;- as.character(Predictions$Visitor.Team)
+Predictions$Home.Team &lt;- as.character(Predictions$Home.Team)
+Predictions$Visitor.Team[Predictions$Visitor.Team == &quot;Pittsburgh&quot;] &lt;- &quot;Pitt&quot;
+Predictions$Home.Team[Predictions$Home.Team == &quot;Pittsburgh&quot;] &lt;- &quot;Pitt&quot;
+
+AwayStats &lt;- rbind(Clemson.Away, Duke.Away, FIU.Away, Florida.State.Away, Georgia.Tech.Away, Kentucky.Away, Liberty.Away, Louisville.Away, Miami.Away, NC.State.Away, North.Carolina.Away, Notre.Dame.Away, Syracuse.Away, Virginia.Away, Virginia.Tech.Away, Wake.Away, Boston.College.Away, Georgia.Away, Pitt.Away)
+AwayStats &lt;- AwayStats[, -20]
+
+AP &lt;- left_join(Predictions, AwayStats, by = &quot;Visitor.Team&quot;)
+
+HomeStats &lt;- rbind(Clemson.Home, Duke.Home, FIU.Home, Florida.State.Home, Georgia.Tech.Home, Kentucky.Home, Liberty.Home, Louisville.Home, Miami.Home, NC.State.Home, North.Carolina.Home, Notre.Dame.Home, Syracuse.Home, Virginia.Home, Virginia.Tech.Home, Wake.Home, Boston.College.Home, Georgia.Home, Pitt.Home, South.Carolina.Home, Florida.Home)
+
+Predictions.test &lt;- left_join(AP, HomeStats, by = &quot;Home.Team&quot;)
+Predictions.test</code></pre>
+<pre><code>##          Date      Home.Team   Visitor.Team Spread Total Result
+## 1  11/16/2019        Clemson    Wake Forest     NA    NA     NA
+## 2  11/16/2019           Duke       Syracuse     NA    NA     NA
+## 3  11/16/2019  Florida State  Alabama State     NA    NA     NA
+## 4  11/16/2019   Georgia Tech  Virginia Tech     NA    NA     NA
+## 5  11/16/2019       NC State     Louisville     NA    NA     NA
+## 6  11/21/2019   Georgia Tech       NC State     NA    NA     NA
+## 7  11/23/2019     Notre Dame Boston College     NA    NA     NA
+## 8  11/23/2019            FIU          Miami     NA    NA     NA
+## 9  11/23/2019    Wake Forest           Duke     NA    NA     NA
+## 10 11/23/2019     Louisville       Syracuse     NA    NA     NA
+## 11 11/23/2019 North Carolina         Mercer     NA    NA     NA
+## 12 11/23/2019  Virginia Tech           Pitt     NA    NA     NA
+## 13 11/23/2019       Virginia        Liberty     NA    NA     NA
+## 14 11/29/2019       Virginia  Virginia Tech     NA    NA     NA
+## 15 11/30/2019           Pitt Boston College     NA    NA     NA
+## 16 11/30/2019 South Carolina        Clemson     NA    NA     NA
+## 17 11/30/2019           Duke          Miami     NA    NA     NA
+## 18 11/30/2019        Florida  Florida State     NA    NA     NA
+## 19 11/30/2019   Georgia Tech        Georgia     NA    NA     NA
+## 20 11/30/2019       Kentucky     Louisville     NA    NA     NA
+## 21 11/30/2019       NC State North Carolina     NA    NA     NA
+## 22 11/30/2019       Syracuse    Wake Forest     NA    NA     NA
+##    Away_PassCmp_Avg Away_PassAtt_Avg Away_PassPct_Avg Away_PassYds_Avg
+## 1          21.00000         30.00000         70.70000         277.5000
+## 2          24.66667         38.33333         63.76667         268.6667
+## 3                NA               NA               NA               NA
+## 4          19.50000         33.50000         55.85000         264.0000
+## 5          16.50000         26.50000         62.55000         290.5000
+## 6          26.00000         50.50000         51.40000         253.5000
+## 7          14.00000         29.50000         47.75000         231.5000
+## 8          30.00000         39.00000         76.90000         309.0000
+## 9          21.00000         28.00000         75.00000         188.0000
+## 10         24.66667         38.33333         63.76667         268.6667
+## 11               NA               NA               NA               NA
+## 12         32.00000         49.50000         64.50000         320.0000
+## 13         16.00000         31.00000         51.60000         173.0000
+## 14         19.50000         33.50000         55.85000         264.0000
+## 15         14.00000         29.50000         47.75000         231.5000
+## 16         20.50000         36.00000         57.40000         298.5000
+## 17         30.00000         39.00000         76.90000         309.0000
+## 18         19.50000         36.00000         54.05000         192.0000
+## 19         19.50000         26.00000         74.00000         222.0000
+## 20         16.50000         26.50000         62.55000         290.5000
+## 21         25.50000         40.50000         62.35000         282.5000
+## 22         21.00000         30.00000         70.70000         277.5000
+##    Away_PassTD_Avg Away_RushAtt_Avg Away_RushYds_Avg Away_RushAvg_Avg
+## 1         2.500000         44.50000            199.0         4.650000
+## 2         1.333333         36.66667            101.0         2.633333
+## 3               NA               NA               NA               NA
+## 4         3.500000         42.50000            125.5         2.950000
+## 5         3.000000         45.50000            174.5         3.850000
+## 6         1.500000         32.50000            116.0         3.500000
+## 7         2.000000         53.00000            265.5         5.150000
+## 8         2.000000         37.00000            179.0         4.800000
+## 9         3.000000         41.00000            234.0         5.700000
+## 10        1.333333         36.66667            101.0         2.633333
+## 11              NA               NA               NA               NA
+## 12        1.500000         30.00000             46.5         1.500000
+## 13        1.000000         37.00000            164.0         4.400000
+## 14        3.500000         42.50000            125.5         2.950000
+## 15        2.000000         53.00000            265.5         5.150000
+## 16        2.000000         30.00000            173.0         5.800000
+## 17        2.000000         37.00000            179.0         4.800000
+## 18        2.000000         26.00000             99.0         3.900000
+## 19        1.500000         40.50000            280.5         6.950000
+## 20        3.000000         45.50000            174.5         3.850000
+## 21        3.000000         41.50000            177.5         4.250000
+## 22        2.500000         44.50000            199.0         4.650000
+##    Away_RushTD_Avg Away_XPM_Avg Away_XPA_Avg Away_XPPercent_Avg
+## 1              1.5          4.0     4.000000              100.0
+## 2              1.0          2.0     2.333333               88.9
+## 3               NA           NA           NA                 NA
+## 4              1.5          5.0     5.000000              100.0
+## 5              2.0          5.5     5.500000              100.0
+## 6              0.5          2.0     2.000000              100.0
+## 7              2.5          3.5     3.500000              100.0
+## 8              1.0          1.0     2.000000               50.0
+## 9              3.0          6.0     6.000000              100.0
+## 10             1.0          2.0     2.333333               88.9
+## 11              NA           NA           NA                 NA
+## 12             0.5          2.0     2.500000               87.5
+## 13             1.0          2.0     2.000000              100.0
+## 14             1.5          5.0     5.000000              100.0
+## 15             2.5          3.5     3.500000              100.0
+## 16             2.0          4.0     4.000000              100.0
+## 17             1.0          1.0     2.000000               50.0
+## 18             0.5          2.5     2.500000              100.0
+## 19             2.0          3.5     3.500000              100.0
+## 20             2.0          5.5     5.500000              100.0
+## 21             0.5          3.0     3.000000              100.0
+## 22             1.5          4.0     4.000000              100.0
+##    Away_FGM_Avg Away_FGA_Avg Away_FGPercent_Avg Away_KickPts_Avg
+## 1     2.0000000          2.0             100.00             10.0
+## 2     0.6666667          1.0              50.00              4.0
+## 3            NA           NA                 NA               NA
+## 4     0.0000000          0.0               0.00              5.0
+## 5     1.5000000          1.5             100.00             10.0
+## 6     2.0000000          3.0              66.70              8.0
+## 7     1.0000000          1.0             100.00              6.5
+## 8     2.0000000          4.0              50.00              7.0
+## 9     1.0000000          1.0             100.00              9.0
+## 10    0.6666667          1.0              50.00              4.0
+## 11           NA           NA                 NA               NA
+## 12    1.5000000          2.0              75.00              6.5
+## 13    2.0000000          3.0              66.70              8.0
+## 14    0.0000000          0.0               0.00              5.0
+## 15    1.0000000          1.0             100.00              6.5
+## 16    1.0000000          2.0              33.35              7.0
+## 17    2.0000000          4.0              50.00              7.0
+## 18    0.5000000          0.5              50.00              4.0
+## 19    3.0000000          3.0             100.00             12.5
+## 20    1.5000000          1.5             100.00             10.0
+## 21    1.0000000          1.5              75.00              6.0
+## 22    2.0000000          2.0             100.00             10.0
+##    Away_Fum_Avg Away_Int_Avg Home_PassCmp_Avg Home_PassAtt_Avg
+## 1     0.0000000          0.5            22.00         34.33333
+## 2     0.6666667          1.0            14.50         32.50000
+## 3            NA           NA            25.25         35.50000
+## 4     1.0000000          1.5            12.50         22.50000
+## 5     1.0000000          1.0            21.00         34.66667
+## 6     1.0000000          0.0            12.50         22.50000
+## 7     0.5000000          0.5            17.00         26.00000
+## 8     0.0000000          0.0            12.00         25.50000
+## 9     0.0000000          0.0            27.00         43.00000
+## 10    0.6666667          1.0            17.50         31.00000
+## 11           NA           NA            16.00         26.00000
+## 12    1.0000000          1.0            12.00         24.00000
+## 13    0.0000000          0.0            22.50         32.00000
+## 14    1.0000000          1.5            22.50         32.00000
+## 15    0.5000000          0.5            23.50         39.00000
+## 16    0.5000000          1.0            25.50         42.00000
+## 17    0.0000000          0.0            14.50         32.50000
+## 18    0.5000000          1.5            24.50         36.50000
+## 19    0.5000000          0.0            12.50         22.50000
+## 20    1.0000000          1.0            17.50         27.25000
+## 21    0.5000000          0.5            21.00         34.66667
+## 22    0.0000000          0.5            21.00         32.00000
+##    Home_PassPct_Avg Home_PassYds_Avg Home_PassTD_Avg Home_RushAtt_Avg
+## 1          63.93333         240.3333       2.0000000         45.00000
+## 2          47.50000         170.5000       0.5000000         49.50000
+## 3          71.05000         338.0000       2.7500000         32.25000
+## 4          56.25000         123.5000       1.0000000         39.00000
+## 5          60.23333         253.0000       0.6666667         35.33333
+## 6          56.25000         123.5000       1.0000000         39.00000
+## 7          65.50000         299.5000       3.0000000         36.50000
+## 8          42.70000         164.5000       1.0000000         50.50000
+## 9          61.66667         346.0000       3.0000000         50.66667
+## 10         55.25000         281.0000       1.0000000         45.00000
+## 11         61.80000         218.0000       2.0000000         36.00000
+## 12         48.55000         196.0000       1.5000000         41.00000
+## 13         68.75000         235.0000       1.0000000         30.50000
+## 14         68.75000         235.0000       1.0000000         30.50000
+## 15         60.75000         253.0000       1.0000000         33.50000
+## 16         59.40000         232.0000       1.0000000         37.50000
+## 17         47.50000         170.5000       0.5000000         49.50000
+## 18         67.35000         289.5000       2.0000000         35.00000
+## 19         56.25000         123.5000       1.0000000         39.00000
+## 20         65.27500         205.7500       1.7500000         43.25000
+## 21         60.23333         253.0000       0.6666667         35.33333
+## 22         64.40000         229.5000       2.0000000         44.50000
+##    Home_RushYds_Avg Home_RushAvg_Avg Home_RushTD_Avg Home_XPM_Avg
+## 1          284.0000         6.033333        3.000000     5.333333
+## 2          160.0000         3.200000        3.500000     3.000000
+## 3           97.7500         3.025000        1.500000     4.250000
+## 4          165.5000         4.450000        1.500000     2.000000
+## 5          166.3333         4.766667        2.000000     2.666667
+## 6          165.5000         4.450000        1.500000     2.000000
+## 7          167.5000         4.600000        3.000000     7.000000
+## 8          214.5000         4.200000        1.500000     3.500000
+## 9          215.0000         4.333333        2.333333     5.333333
+## 10         247.0000         5.500000        2.500000     3.500000
+## 11         121.5000         3.400000        0.500000     2.000000
+## 12         135.0000         3.300000        1.000000     2.500000
+## 13          94.5000         3.100000        2.500000     3.000000
+## 14          94.5000         3.100000        2.500000     3.000000
+## 15         119.0000         3.450000        1.000000     2.000000
+## 16         191.0000         5.050000        1.500000     2.500000
+## 17         160.0000         3.200000        3.500000     3.000000
+## 18         130.0000         3.750000        1.500000     3.500000
+## 19         165.5000         4.450000        1.500000     2.000000
+## 20         221.2500         5.025000        2.250000     4.000000
+## 21         166.3333         4.766667        2.000000     2.666667
+## 22         136.5000         2.950000        1.500000     3.500000
+##    Home_XPA_Avg Home_XPPercent_Avg Home_FGM_Avg Home_FGA_Avg
+## 1      5.333333             100.00     1.000000     1.666667
+## 2      3.000000             100.00     1.500000     1.500000
+## 3      4.250000             100.00     0.750000     1.750000
+## 4      2.000000             100.00     0.000000     0.500000
+## 5      2.666667             100.00     2.333333     2.666667
+## 6      2.000000             100.00     0.000000     0.500000
+## 7      7.000000             100.00     0.500000     1.000000
+## 8      3.500000             100.00     1.500000     2.000000
+## 9      5.333333             100.00     1.000000     1.000000
+## 10     3.500000             100.00     1.500000     2.000000
+## 11     2.000000             100.00     1.000000     1.500000
+## 12     2.500000             100.00     1.000000     1.500000
+## 13     3.500000              83.35     0.500000     1.000000
+## 14     3.500000              83.35     0.500000     1.000000
+## 15     2.000000             100.00     1.000000     2.000000
+## 16     2.500000             100.00     2.000000     2.000000
+## 17     3.000000             100.00     1.500000     1.500000
+## 18     3.500000             100.00     1.500000     1.500000
+## 19     2.000000             100.00     0.000000     0.500000
+## 20     4.000000             100.00     0.750000     1.500000
+## 21     2.666667             100.00     2.333333     2.666667
+## 22     3.500000              50.00     1.500000     1.500000
+##    Home_FGPercent_Avg Home_KickPts_Avg Home_Fum_Avg Home_Int_Avg
+## 1            66.66667         8.333333    0.6666667     1.333333
+## 2           100.00000         7.500000    1.5000000     1.500000
+## 3            62.50000         6.500000    1.0000000     0.000000
+## 4             0.00000         2.000000    0.5000000     1.500000
+## 5            88.90000         9.666667    0.0000000     1.000000
+## 6             0.00000         2.000000    0.5000000     1.500000
+## 7            50.00000         8.500000    0.5000000     0.000000
+## 8            50.00000         8.000000    0.5000000     0.000000
+## 9           100.00000         8.333333    0.6666667     1.000000
+## 10           83.35000         8.000000    1.5000000     0.000000
+## 11           33.35000         5.000000    0.0000000     0.000000
+## 12           75.00000         5.500000    1.5000000     0.500000
+## 13           50.00000         4.500000    0.0000000     1.000000
+## 14           50.00000         4.500000    0.0000000     1.000000
+## 15           33.35000         5.000000    0.0000000     1.000000
+## 16          100.00000         8.500000    1.0000000     0.500000
+## 17          100.00000         7.500000    1.5000000     1.500000
+## 18          100.00000         8.000000    2.5000000     1.000000
+## 19            0.00000         2.000000    0.5000000     1.500000
+## 20           50.00000         6.250000    1.2500000     0.750000
+## 21           88.90000         9.666667    0.0000000     1.000000
+## 22          100.00000         8.000000    1.0000000     0.500000</code></pre>
 
 
 
