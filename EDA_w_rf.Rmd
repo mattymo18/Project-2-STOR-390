@@ -1,0 +1,158 @@
+---
+title: "eda2.rmd"
+author: "Daniel Barlow"
+date: "November 7, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(readxl)
+library(randomForest)
+library(glmnet)
+df <- read.csv("Final_Game_Data.csv")
+Predictions <- read.csv("Predictions.csv")
+Predictions.test <- read.csv("Predictions_test.csv")
+```
+
+```{r}
+df$Home_balance <- df$Home_RushAtt/(df$Home_RushAtt + df$Home_PassAtt)
+df$Away_balance <- df$Away_RushAtt/(df$Away_RushAtt + df$Away_PassAtt)
+df <- na.omit(df)
+df$Home.Team <- as.character(df$Home.Team)
+df$Visitor.Team <- as.character(df$Visitor.Team)
+Predictions$Home.Team <- as.character(Predictions$Home.Team)
+Predictions$Visitor.Team <- as.character(Predictions$Visitor.Team)
+Predictions$Home.Team[Predictions$Home.Team == "Pittsburgh"] <- "Pitt"
+Predictions$Visitor.Team[Predictions$Visitor.Team == "Pittsburgh"] <- "Pitt"
+```
+
+```{r}
+set.seed(1305)
+size = floor(.7*nrow(df))
+train.idx = sample(seq_len(nrow(df)), size = size)
+train = df[train.idx, -c(1:4, 25, 45:49)] #takes out any variables that have characters associated to them as well as spread, home.score, visitor.score, total
+test = df[-train.idx, -c(1:4, 25, 45:49)]
+```
+
+GLM
+```{r}
+glm.test = df[-train.idx, -c(1:4, 25, 45:49)]
+glm.test$Home_X.1 <- ifelse(test$Home_X.1 == "W", 1, 0)
+
+glm.model = glm(Home_X.1 ~ ., data = train, family = "binomial", control = list(maxit = 50))
+probs.full = glm.model %>% 
+  predict(test, type = "response")
+predicted.classes <- ifelse(probs.full > 0.5, 1, 0)
+observed.classes = glm.test$Home_X.1
+mean(predicted.classes == observed.classes)
+```
+
+The most commonly used penalized regression include:
+
+ridge regression: variables with minor contribution have their coefficients close to zero. However, all the variables are incorporated in the model. This is useful when all variables need to be incorporated in the model according to domain knowledge.
+```{r}
+ridge.test = df[-train.idx, -c(1:4, 25, 45:49)]
+ridge.test$Home_X.1 <- ifelse(test$Home_X.1 == "W", 1, 0)
+
+x.train <- model.matrix(Home_X.1~., train)[, -1]
+y.train <- ifelse(train$Home_X.1 == "W", 1, 0)
+x.test <- model.matrix(Home_X.1 ~., ridge.test)[, -1]
+y.test <- ifelse(ridge.test$Home_X.1 == "W", 1, 0)
+ridge.lambda =cv.glmnet(x.train, y.train, alpha = 0)
+plot(ridge.lambda)
+ridge.lambda$lambda.min
+ridge.model = glmnet(x.train, y.train, family = "binomial", alpha = 0, lambda = ridge.lambda$lambda.min)
+probs.ridge <- ridge.model %>% 
+  predict(s='ridge.lambda$lambda.min', newx=x.test, type="response")
+quantile(probs.ridge)
+predicted.classes <- ifelse(probs.ridge > 0.5, "1", "0")
+observed.classes <- ridge.test$Home_X.1
+mean(predicted.classes == observed.classes)
+```
+
+lasso regression: the coefficients of some less contributive variables are forced to be exactly zero. Only the most significant variables are kept in the final model.
+```{r}
+set.seed(1305)
+lasso.test = df[-train.idx, -c(1:4, 25, 45:49)]
+lasso.test$Home_X.1 <- ifelse(test$Home_X.1 == "W", 1, 0)
+#build model matrixes
+x.train <- model.matrix(Home_X.1~., train)[, -1]
+y.train <- ifelse(train$Home_X.1 == "W", 1, 0)
+x.test <- model.matrix(Home_X.1 ~., lasso.test)[, -1]
+y.test <- ifelse(lasso.test$Home_X.1 == "W", 1, 0)
+lasso.lambda =cv.glmnet(x.train, y.train, family = "binomial", alpha = 1)
+# plot(lasso.lambda)
+lasso.lambda$lambda.min
+lasso.model = glmnet(x.train, y.train, family = "binomial", alpha = 1, lambda = lasso.lambda$lambda.min)
+# coef(lasso.lambda)
+probs.lasso <- lasso.model %>% 
+  predict(s='lasso.lambda$lambda.min', newx=x.test, type="response")
+predicted.classes <- ifelse(probs.lasso > 0.5, "1", "0")
+observed.classes <- lasso.test$Home_X.1
+mean(predicted.classes == observed.classes)
+```
+
+elastic net regression: the combination of ridge and lasso regression. It shrinks some coefficients toward zero (like ridge regression) and set some coefficients to exactly zero (like lasso regression)
+
+
+Random Forest
+```{r}
+#randomForest(Home.Score ~ ., train.score[, c(3:20, 41, 43, 44, 47)], type = "regression")
+
+oob.err=double(18)
+test.err=double(18)
+
+#mtry is no of Variables randomly chosen at each split
+for(mtry in 1:18) {
+  rf=randomForest(Home.Score ~ ., train.score[, c(3:20, 41, 47)], type = "regression", mtry=mtry, ntree=400) 
+  oob.err[mtry] = rf$mse[400] #Error of all Trees fitted
+  
+  pred<-predict(rf, test.score[, c(3:20, 41, 47)]) #Predictions on Test Set for each Tree
+  test.err[mtry]= with(test.score[, c(3:20, 41, 47)], mean( (Home.Score - pred)^2)) #Mean Squared Test Error
+  
+  cat(mtry," ") #printing the output to the console
+  
+}
+which.min(test.err)
+#test.err
+
+predict(rf, Predictions.test)
+```
+
+linear models
+```{r}
+Predictions.test$Home_balance <- Predictions.test$Home_RushAtt/(Predictions.test$Home_RushAtt + Predictions.test$Home_PassAtt)
+Predictions.test$Away_balance <- Predictions.test$Away_RushAtt/(Predictions.test$Away_RushAtt + Predictions.test$Away_PassAtt)
+  
+train.score = df[train.idx, -c(1, 3, 5, 24, 44, 47:49)]
+test.score = df[-train.idx, -c(1, 3, 5, 24, 44, 47:49)]
+
+lm1.Home.score <- lm(Home.Score ~ ., data = train.score[, c(1, 3:20, 41, 43, 44, 47)])
+step(lm1.Home.score, trace = 0)
+lm2.Home.score <- lm(Home.Score ~ Home_PassAtt + Home_PassTD + Home_RushYds + Home_RushTD + Home_XPA + Home_FGM + Home_FGPercent + Home.O.Rank, data = train.score[, c(1, 3:20, 41, 43, 44, 47)])
+summary(lm2.Home.score)
+predict(lm2.Home.score, newdata = test.score)
+modelr::rmse(lm2.Home.score, data = test.score)
+
+#lm1.Visit.score <- lm(Home.Score ~ ., data = train.score[, c(2 )])
+predict(lm2.Home.score, newdata = Predictions.test)
+```
+
+```{r}
+OStats19 <- read_csv("C:/Users/barlo/Downloads/2019 Offense.csv", 
+    skip = 1)
+OStats19 <- OStats19[, c(1,2)]
+
+DStats19 <- read_csv("C:/Users/barlo/Downloads/2019 Defense.csv", 
+    skip = 1)
+DStats19 <- DStats19[, c(1,2)]
+
+rdf <- left_join(OStats19, DStats19, by = "School")
+names(rdf) <- c("O.Rank", "School", "D.Rank")
+write.csv(rdf, file = "Ranking.csv")
+```
+
