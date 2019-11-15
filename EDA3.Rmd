@@ -1,0 +1,36 @@
+---
+title: "EDA3"
+author: "Sarah Kang"
+date: "11/14/2019"
+output: html_document
+---
+
+```{r}
+set.seed(1305)
+size = floor(.7*nrow(df))
+train.idx = sample(seq_len(nrow(df)), size = size)
+train.home = df[train.idx, -c(1, 3, 5, 24, 25, 40, 44, 47:49)]
+test.home = df[-train.idx, -c(1, 3, 5, 24, 25, 40, 44, 47:49)]
+train.visitor = df[train.idx, -c(1, 3, 5, 24, 25, 40, 44, 47:49)]
+test.visitor = df[-train.idx, -c(1, 3, 5, 24, 25, 40, 44, 47:49)]
+```
+
+poisson regression
+```{r}
+poisson1 <- glm(Home.Score ~., data = train.home, family = poisson) 
+step.poisson1 <- step(poisson1, trace =0)
+poisson2 <- glm(formula = step.poisson1, data = train.home)
+summary(poisson2)
+predict(poisson2, newdata = test.home)
+modelr::mae(poisson2, data = test.home)
+```
+
+```{r}
+poisson3 <- glm(Visitor.Score ~., data = train.visitor, family = poisson) 
+step.poisson2 <- step(poisson3, trace =0)
+poisson4 <- glm(formula = step.poisson2, data = train.visitor)
+summary(poisson4)
+predict(poisson4, newdata = test.visitor)
+modelr::mae(poisson4, data = test.visitor)
+```
+
