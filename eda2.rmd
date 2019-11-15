@@ -114,3 +114,10 @@ importance(rf.model)
 #so obviously extra points mdae and attempted are clearly important because those only happen after Tds, but I think it is great to see that the variables we added seem to be important
 ```
 
+model
+```{r}
+train.score = df[train.idx, -c(1, 3, 5, 24, 44, 47:49)]
+test.score = df[-train.idx, -c(1, 3, 5, 24, 44, 47:49)]
+
+```
+
