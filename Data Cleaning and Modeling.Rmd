@@ -496,7 +496,10 @@ Visitor.Rankings <- Rankings %>%
 Visitor.Rankings$Visitor.Team = as.character(Visitor.Rankings$Visitor.Team)
 
 Predictions.test.rank <- left_join(Predictions.test, Visitor.Rankings)
-Predicitions.with.rank <- left_join(Predictions.test.rank, Home.Rankings)
-#write.csv(Predictions.test, "Predictions_test.csv")
+Predictions.with.rank <- left_join(Predictions.test.rank, Home.Rankings)
+
+Predictions.with.rank$Home_balance <- Predictions.with.rank$Home_RushAtt/(Predictions.with.rank$Home_RushAtt + Predictions.with.rank$Home_PassAtt)
+Predictions.with.rank$Away_balance <- Predictions.with.rank$Away_RushAtt/(Predictions.with.rank$Away_RushAtt + Predictions.with.rank$Away_PassAtt)
+#write.csv(Predictions.with.rank, "Predictions_test.csv")
 ```
 
