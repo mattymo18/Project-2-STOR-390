@@ -137,8 +137,4 @@ predict(lm2.Visitor.score, newdata = test.score.visitor)
 modelr::rmse(lm2.Visitor.score, data = test.score.visitor)
 ```
 
-lasso for scores
-```{r}
-
-```
 
