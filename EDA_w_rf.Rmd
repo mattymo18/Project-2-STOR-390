@@ -48,6 +48,7 @@ summary(glm.model)
 coef(glm.model)
 probs.full = glm.model %>% 
   predict(Predictions.test, type = "response")
+predicted.classes <- ifelse(probs.full > 0.5, "1", "0")
 ```
 
 The most commonly used penalized regression include:
@@ -88,7 +89,7 @@ lasso.model = glmnet(x.train, y.train, family = "binomial", alpha = 1, lambda = 
 # coef(lasso.lambda)
 probs.lasso <- lasso.model %>% 
   predict(s='lasso.lambda$lambda.min', newx=data.matrix(Predictions.test[, -c(1:7)]), type="response")
-predicted.classes <- ifelse(probs.lasso > 0.5, "1", "0")
+(predicted.classes <- ifelse(probs.lasso > 0.5, "1", "0"))
 ```
 
 Random Forest
@@ -112,6 +113,7 @@ legend("top", colnames(rf.model$err.rate),col=1:4,cex=0.8,fill=1:4)
 
 rf.model$test$confusion
 predict(rf.model, newdata=data.matrix(Predictions.test[, -c(1:7)]))
+importance(rf.model)
 ```
  
 
@@ -158,7 +160,7 @@ step.poisson1.home.score <- step(poisson1.home.score, trace =0)
 
 poisson2.home.score <- glm(formula = step.poisson1.home.score, data = train.Home.score)
 summary(poisson2.home.score)
-predict(poisson2.home.score, newdata = train.Home.score)
+predict(poisson2.home.score, newdata = Predictions.test)
 modelr::rmse(poisson2.home.score, data = train.Home.score)
 
 poisson1.visitor.score <- glm(Visitor.Score ~., data = train.Visitor.score, family = poisson)
@@ -166,7 +168,7 @@ step.poisson1.home.score <- step(poisson1.visitor.score, trace =0)
 
 poisson2.visitor.score <- glm(formula = step.poisson1.home.score, data = train.Visitor.score)
 summary(poisson2.visitor.score)
-predict(poisson2.visitor.score, newdata = test.Visitor.score)
+predict(poisson2.visitor.score, newdata = Predictions.test)
 modelr::rmse(poisson2.visitor.score, data = test.Visitor.score)
 ```
 
@@ -206,9 +208,10 @@ lasso1.visitor.score = cv.glmnet(x.train.visitor, y.train.visitor, family = "poi
 coef(lasso1.visitor.score, s='lambda.min')
 # summary(lasso1.home.score)
 predict(lasso1.visitor.score, newx = data.matrix(Predictions.test[, -c(1:7)]), type = "response", s = 'lambda.min')
+
+sqrt(lasso1.home.score$cvm[lasso1.home.score$lambda == lasso1.home.score$lambda.1se])
+sqrt(lasso1.visitor.score$cvm[lasso1.visitor.score$lambda == lasso1.visitor.score$lambda.1se])
 ```
-
-
 
 Random Forest
 ```{r}
